@@ -1,0 +1,13 @@
+core_freq_min=500
+arm_64bit=1
+kernel=bootloader.img
+armstub=armstub8.bin
+
+# Disable pull downs
+gpio=22-27=np
+
+# Enable jtag pins (i.e. GPIO22-GPIO27)
+enable_jtag_gpio=1
+
+# GIC
+enable_gic=1

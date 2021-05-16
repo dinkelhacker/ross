@@ -1,0 +1,9 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "debugger setup",
+        "command": "gnome-terminal", // Could be any other shell command
+        "args": ["echo test"],
+        "type": "shell",
+    }]
+}

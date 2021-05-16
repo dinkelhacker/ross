@@ -1,0 +1,291 @@
+[
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/bootloader",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_bootloader/bootloader.o",
+      "src/bootloader/bootloader.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/bootloader/bootloader.c",
+    "output": "/home/phil/dev/pi-os/build/objects_bootloader/bootloader.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/bootloader",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_bootloader/kernel_loader.o",
+      "src/bootloader/kernel_loader.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/bootloader/kernel_loader.c",
+    "output": "/home/phil/dev/pi-os/build/objects_bootloader/kernel_loader.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_common/io.o",
+      "src/common/io.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/common/io.c",
+    "output": "/home/phil/dev/pi-os/build/objects_common/io.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_common/utils.o",
+      "src/common/utils.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/common/utils.c",
+    "output": "/home/phil/dev/pi-os/build/objects_common/utils.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-c",
+      "-o",
+      "build/objects_common/asm_utils.o",
+      "src/common/asm_utils.S"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/common/asm_utils.S",
+    "output": "/home/phil/dev/pi-os/build/objects_common/asm_utils.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-I./src/bootloader",
+      "-c",
+      "-o",
+      "build/objects_bootloader/boot.o",
+      "src/bootloader/boot.S"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/bootloader/boot.S",
+    "output": "/home/phil/dev/pi-os/build/objects_bootloader/boot.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/kernel",
+      "-I./include/kernel/asm",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_kernel/exception_handlers.o",
+      "src/kernel/exception_handlers.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/exception_handlers.c",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/exception_handlers.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/kernel",
+      "-I./include/kernel/asm",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_kernel/main.o",
+      "src/kernel/main.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/main.c",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/main.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/kernel",
+      "-I./include/kernel/asm",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_kernel/schedulder.o",
+      "src/kernel/schedulder.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/schedulder.c",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/schedulder.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/kernel",
+      "-I./include/kernel/asm",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_kernel/tasks.o",
+      "src/kernel/tasks.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/tasks.c",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/tasks.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-g",
+      "-mcpu=cortex-a72",
+      "-fpic",
+      "-ffreestanding",
+      "-DQEMU_DEBUG",
+      "-I./include/common",
+      "-I./include/kernel",
+      "-I./include/kernel/asm",
+      "-c",
+      "-O0",
+      "-Wall",
+      "-Wextra",
+      "-std=c99",
+      "-Werror-implicit-function-declaration",
+      "-o",
+      "build/objects_kernel/timer.o",
+      "src/kernel/timer.c"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/timer.c",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/timer.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-I./src/kernel",
+      "-I./include/kernel/asm",
+      "-I./src/common",
+      "-c",
+      "-o",
+      "build/objects_kernel/boot_kernel.o",
+      "src/kernel/boot_kernel.S"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/boot_kernel.S",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/boot_kernel.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-I./src/kernel",
+      "-I./include/kernel/asm",
+      "-I./src/common",
+      "-c",
+      "-o",
+      "build/objects_kernel/exceptions.o",
+      "src/kernel/exceptions.S"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/exceptions.S",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/exceptions.o"
+  },
+  {
+    "arguments": [
+      "./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc",
+      "-I./src/kernel",
+      "-I./include/kernel/asm",
+      "-I./src/common",
+      "-c",
+      "-o",
+      "build/objects_kernel/syscall.o",
+      "src/kernel/syscall.S"
+    ],
+    "directory": "/home/phil/dev/pi-os",
+    "file": "/home/phil/dev/pi-os/src/kernel/syscall.S",
+    "output": "/home/phil/dev/pi-os/build/objects_kernel/syscall.o"
+  }
+]

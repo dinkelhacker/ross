@@ -1,0 +1,9 @@
+/build/gcc*
+/build/*.elf
+/build/*.map
+/build/*.img
+/build/objects*
+/build/.gdb_history
+*_gen.ld
+*gdb*
+tags

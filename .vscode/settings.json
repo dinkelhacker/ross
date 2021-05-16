@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "error.h": "c",
+        "*.def": "c",
+        "tasks.h": "c"
+    }
+}
