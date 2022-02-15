@@ -21,9 +21,4 @@
 #define PAGING_MEM        (MEMORY_TOP - MEMORY_BOTTOM) // start of paging memory
 #define PAGES             (PAGING_MEM/PAGE_SIZE)       // number of pages
 
-
-
-
-
-
 #endif

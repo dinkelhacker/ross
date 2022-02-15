@@ -2,12 +2,12 @@
 .globl ret_from_fork
 //.weak schedule_tail
 ret_from_fork:
-    // enable preemption
-    bl    schedule_tail
-    // restore argument
-    mov    x0, x20
-    // bye bye...
-    blr    x19
+	// enable preemption
+	bl    schedule_tail
+	// restore argument
+	mov    x0, x20
+	// bye bye...
+	blr    x19
 
 
 .globl cpu_switch_to
@@ -24,7 +24,7 @@ cpu_switch_to:
 	stp	x29, x9, [x8], #16
 	str	x30, [x8] // link register
 	
-  add	x8, x1, x10
+	add	x8, x1, x10
 	// restore callee-saved registers
 	ldp	x19, x20, [x8], #16
 	ldp	x21, x22, [x8], #16
