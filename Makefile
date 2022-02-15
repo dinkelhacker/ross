@@ -5,7 +5,7 @@ OBJCPY  = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-
 ASM = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc
 
 CFLAGS = -g3 -mcpu=cortex-a72 -fpic -ffreestanding
-AFLAGS =
+AFLAGS = -D_ASM_
 # Uncomment if debugging with QEMU
 #CFLAGS += -DQEMU_DEBUG
 # Uncomment for boot code debugging

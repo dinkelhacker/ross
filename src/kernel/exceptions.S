@@ -69,7 +69,7 @@
 .macro  restore_processor_state
 	// get saved program status
 	ldr	x23, [sp, #16 * 16]
-	// get pc of thr previously interrupted task
+	// get pc of the previously interrupted task (x22) and x30
 	ldp	x30, x22, [sp, #16 * 15] 
 
 	// put address in exception link register

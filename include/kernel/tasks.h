@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+// offset of the cpu context in the task struct
+#define OFFSET_CPU_CONTEXT 0
+
+#ifndef _ASM_
 // according to the ARM calling conventions registers 0 - 18 can be overwritten by called functions
 // therefore they must not be restored as we can't assume they will survive a function call
 struct cpu_context {
@@ -40,4 +44,5 @@ extern int nr_tasks;
 
 extern void process(char* string);
 extern int fork(ulong fn_addr, ulong args);
+#endif
 #endif
