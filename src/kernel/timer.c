@@ -9,7 +9,7 @@ void timer_init(void)
 {
 	uint cur = mmio_read(SYS_TIMER_CLO);
 	// system timer runs at 1 MHz == 1 sec
-	cur += 6 * 5000000;
+	cur += 2 * 5000000;
 	
 
 	mmio_write(SYS_TIMER_C1, cur);
