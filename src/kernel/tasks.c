@@ -4,6 +4,7 @@
 #include "error.h"
 #include "tasks.h"
 #include "timer.h"
+#include "types.h"
 
 static struct task_struct init_task =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 
@@ -13,7 +14,7 @@ int nr_tasks = 1;
 
 void process(char* string)
 {
-	unsigned int i = 0;
+	uint i = 0;
 
 	while(1) {
 		uart_writeText(string);

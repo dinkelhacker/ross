@@ -1,4 +1,5 @@
 #include "error.h"
+#include "types.h"
 #include "tasks.h"
 #include "memory_layout.h"
 #include "scheduler.h"
@@ -8,7 +9,7 @@ extern void ret_from_fork(void);
 
 #define THREAD_SIZE 4096
 
-int fork(unsigned long fn_addr, unsigned long args)
+int fork(ulong fn_addr, ulong args)
 {
 	
 	// disable preemption during the fork
@@ -34,8 +35,8 @@ int fork(unsigned long fn_addr, unsigned long args)
 
 	// setup pc so we will immediately execute the schedule tail
 	// and return form fork
-	p->cpu_context.pc = (unsigned long) ret_from_fork;
-	p->cpu_context.sp = (unsigned long) p + PAGE_SIZE;
+	p->cpu_context.pc = (ulong) ret_from_fork;
+	p->cpu_context.sp = (ulong) p + PAGE_SIZE;
 
 	int pid = nr_tasks++;
 	p->pid = pid;

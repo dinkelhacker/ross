@@ -1,6 +1,7 @@
-unsigned int atoi(char *string)
+#include "types.h"
+uint atoi(char *string)
 {
-	unsigned int res;
+	uint res;
 	while(*string)
 	{
 		res = res * 10 + (*string) - '0';

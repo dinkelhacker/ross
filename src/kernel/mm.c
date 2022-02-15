@@ -1,7 +1,8 @@
 #include "memory_layout.h"
+#include "types.h"
 static unsigned short mem_map [PAGES] = {0,};
 
-unsigned long get_free_page()
+ulong get_free_page()
 {
 	for (int i = 0; i < PAGES; i++) {
 		if (mem_map[i] == 0){
@@ -12,6 +13,6 @@ unsigned long get_free_page()
 	return 0;
 }
 
-void free_page(unsigned long p){
+void free_page(ulong p){
 	mem_map[(p - MEMORY_BOTTOM) / PAGE_SIZE] = 0;
 }

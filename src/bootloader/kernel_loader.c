@@ -2,12 +2,13 @@
 #include <stdbool.h>
 #include "asm_utils.h"
 #include "utils.h"
+#include "types.h"
 
-static void copyKernelToAddr(unsigned int numBytes, char * dst_addr);
+static void copyKernelToAddr(uint numBytes, char * dst_addr);
 
 void load_kernel(void* dst_addr)
 {
-	unsigned int kernel_size;
+	uint kernel_size;
 	// wait for boot commadn
 	if(readString("boot?")) {
 		// confirm command
@@ -23,9 +24,9 @@ void load_kernel(void* dst_addr)
 	}
 }
 
-static void copyKernelToAddr(unsigned int numBytes, char * dst_addr)
+static void copyKernelToAddr(uint numBytes, char * dst_addr)
 {
-	for(unsigned int i = 0; i < numBytes; i++) {
+	for(uint i = 0; i < numBytes; i++) {
 		char c = uart_readByteBlocking();
 		*dst_addr = c;
 		dst_addr++;

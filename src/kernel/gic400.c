@@ -1,4 +1,5 @@
 #include "gic400.h"
+#include "types.h"
 #include "error.h"
 
 typedef struct {
@@ -8,12 +9,12 @@ typedef struct {
 
 static gic400_t gic400;
 
-void gicd_enableir(unsigned int irid);
-int gicd_groupir(unsigned int irid, unsigned int group);
-int gicd_irtarget(unsigned int irid, unsigned int cpuid);
-int gicd_ctrl(unsigned int mode);
-int gicc_ctrl(unsigned int mode);
-int gic_ctrl(unsigned int mode, unsigned int* ctl);
+void gicd_enableir(uint irid);
+int gicd_groupir(uint irid, uint group);
+int gicd_irtarget(uint irid, uint cpuid);
+int gicd_ctrl(uint mode);
+int gicc_ctrl(uint mode);
+int gic_ctrl(uint mode, uint* ctl);
 
 int gic400_init(void* interrupt_controller_base)
 {
@@ -41,30 +42,30 @@ int gic400_init(void* interrupt_controller_base)
 	return error;
 }
 
-//void gicd_icfg(unsigned int irid, unsigned int mode){
+//void gicd_icfg(uint irid, uint mode){
 //  if(mode > 1)
 //    return ERROR;
 //
 //  gicd400.gicd->icfg[irid/16] = 
 //}
 
-void gicd_enableir(unsigned int irid)
+void gicd_enableir(uint irid)
 {
 	gic400.gicd->isenable[irid/32] |= 0x1 << (irid % 32);
 }
 
-int gicd_groupir(unsigned int irid, unsigned int group)
+int gicd_groupir(uint irid, uint group)
 {
 	if(group>1)
 			return ERROR;
 
-	unsigned int groupv = (group == 1)? 0x1:0x0;
+	uint groupv = (group == 1)? 0x1:0x0;
 	gic400.gicd->igroup[irid/32] |= groupv << (irid % 32);
 
 	return OK;
 }
 
-int gicd_irtarget(unsigned int irid, unsigned int cpuid)
+int gicd_irtarget(uint irid, uint cpuid)
 {
 	if(cpuid > 3)
 			return ERROR;
@@ -74,19 +75,19 @@ int gicd_irtarget(unsigned int irid, unsigned int cpuid)
 	return OK;
 }
 
-int gicd_ctrl(unsigned int mode)
+int gicd_ctrl(uint mode)
 {
 	return gic_ctrl(mode, &(gic400.gicd->ctl));
 }
 
-int gicc_ctrl(unsigned int mode)
+int gicc_ctrl(uint mode)
 {
 	return gic_ctrl(mode, &(gic400.gicc->ctl));
 }
 
-int gic_ctrl(unsigned int mode, unsigned int* ctl)
+int gic_ctrl(uint mode, uint* ctl)
 {
-	unsigned int tmp = *ctl;
+	uint tmp = *ctl;
 	*ctl |= mode;
 
 	// check if we had the right permissions to set the ctl bits
@@ -97,12 +98,12 @@ int gic_ctrl(unsigned int mode, unsigned int* ctl)
 }
 
 // acknowledge pending irq
-unsigned int gicc_apirq()
+uint gicc_apirq()
 {
 	return gic400.gicc->ia;
 }
 
-void gicc_eoi(unsigned int irid)
+void gicc_eoi(uint irid)
 {
 	gic400.gicc->eoi = irid;
 }

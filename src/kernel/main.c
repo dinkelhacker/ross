@@ -10,6 +10,7 @@
 #include "procconf.h"
 #include "error.h"
 #include "tasks.h"
+#include "types.h"
 
 
 void os_idle(void);
@@ -21,7 +22,7 @@ void main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 	(void) x2;
 	(void) x3;
 	
-	volatile unsigned int exceptionLevel = getExceptionLevel();
+	volatile uint exceptionLevel = getExceptionLevel();
 	init_vector_table();
  
 	// init the interrupt controller
@@ -44,7 +45,7 @@ void main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 
 void os_entry()
 {
-	volatile unsigned int exceptionLevel = getExceptionLevel();
+	volatile uint exceptionLevel = getExceptionLevel();
 	uart_init();
 	enable_irq();
 	timer_init();
@@ -58,8 +59,8 @@ void os_entry()
 	else if(exceptionLevel == 3)
 		uart_writeText("Running at EL3 \n");
 	
-	fork((unsigned long) &process, (unsigned long) "Task 1\n");
-	fork((unsigned long) &process, (unsigned long) "Task 2\n");
+	fork((ulong) &process, (ulong) "Task 1\n");
+	fork((ulong) &process, (ulong) "Task 2\n");
 
 	os_idle();
 }
