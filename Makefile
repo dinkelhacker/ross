@@ -68,7 +68,6 @@ $(BOOTLDR_OBJ_DIR)/%.o: $(BOOTLOADER_SRC)/%.S
 KERNEL_OBJ_DIR = ./build/objects_kernel
 KERNEL_SRC = ./src/kernel
 KERNEL_INCLUDE = ./include/kernel
-KERNEL_ASM_INCLUDE = ./include/kernel/asm
 KERNEL_SOURCES = $(wildcard $(KERNEL_SRC)/*.c)
 KERNEL_ASMSOURCES = $(wildcard $(KERNEL_SRC)/*.S)
 
@@ -86,11 +85,11 @@ kernel: $(KERNEL_OBJECTS) ./build/linker/kernel_gen.ld
 
 $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.c
 		mkdir -p $(@D)
-		$(CC) $(CFLAGS) -I$(COMMON_INCLUDE) -I$(KERNEL_INCLUDE) -I$(KERNEL_ASM_INCLUDE) -c $< -o $@ $(CSRCFLAGS)
+		$(CC) $(CFLAGS) -I$(COMMON_INCLUDE) -I$(KERNEL_INCLUDE) -c $< -o $@ $(CSRCFLAGS)
 
 $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.S
 		mkdir -p $(@D)
-		$(ASM) $(AFLAGS) -I$(KERNEL_SRC) -I$(KERNEL_ASM_INCLUDE) -I$(COMMON_SRC) -I$(COMMON_INCLUDE) -c $< -o $@ 
+		$(ASM) $(AFLAGS) -I$(KERNEL_SRC) -I$(KERNEL_INCLUDE) -I$(COMMON_SRC) -I$(COMMON_INCLUDE) -c $< -o $@ 
 
 .PHONY: clean
 clean:
