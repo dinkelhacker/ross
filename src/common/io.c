@@ -2,34 +2,42 @@
 #include "peripherals.h"
 #include <stdbool.h>
 #include "error.h"
-#include "types.h"
+#include "stdint.h"
 
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK/(baud*8))-1)
 
 // Basic mmio read/write
-void mmio_write(long reg, uint val)
+void
+mmio_write(long reg, uint32_t val)
 {
-	*(volatile uint *) reg = val;
+	*(volatile uint32_t *) reg = val;
 }
 
-uint mmio_read(long reg)
+uint32_t
+mmio_read(long reg)
 {
-	return *(volatile uint *) reg;
+	return *(volatile uint32_t *) reg;
 }
 
-uint gpio_call(uint pin_number, uint value, uint base, uint field_size, uint field_max)
+uint32_t
+gpio_call(
+	uint32_t pin_number,
+	uint32_t value,
+	uint32_t base,
+	uint32_t field_size,
+	uint32_t field_max)
 {
-	uint field_mask = (1 << field_size) - 1;
+	uint32_t field_mask = (1 << field_size) - 1;
 
 	if (pin_number > field_max) return 0;
 	if (value > field_mask) return 0; 
 
-	uint num_fields = 32 / field_size;
-	uint reg = base + ((pin_number / num_fields) * 4);
-	uint shift = (pin_number % num_fields) * field_size;
+	uint32_t num_fields = 32 / field_size;
+	uint32_t reg = base + ((pin_number / num_fields) * 4);
+	uint32_t shift = (pin_number % num_fields) * field_size;
 
-	uint curval = mmio_read(reg);
+	uint32_t curval = mmio_read(reg);
 	curval &= ~(field_mask << shift);
 	curval |= value << shift;
 	mmio_write(reg, curval);
@@ -37,34 +45,48 @@ uint gpio_call(uint pin_number, uint value, uint base, uint field_size, uint fie
 	return 1;
 }
 
-uint gpio_set(uint pin_number, uint value)
+uint32_t 
+gpio_set(
+	uint32_t pin_number,
+	uint32_t value)
 {
 	return gpio_call(pin_number, value, GPSET0, 1, GPIO_MAX_PIN);
 }
 
-uint gpio_clear(uint pin_number, uint value)
+uint32_t
+gpio_clear(
+	uint32_t pin_number,
+	uint32_t value)
 {
 	return gpio_call(pin_number, value, GPCLR0, 1, GPIO_MAX_PIN);
 }
 
-uint gpio_pull(uint pin_number, uint value)
+uint32_t 
+gpio_pull(
+	uint32_t pin_number,
+	uint32_t value)
 {
 	return gpio_call(pin_number, value, GPPUPPDN0, 2, GPIO_MAX_PIN);
 }
 
-uint gpio_function(uint pin_number, uint value)
+uint32_t
+gpio_function(
+	uint32_t pin_number,
+	uint32_t value)
 {
 	return gpio_call(pin_number, value, GPFSEL0, 3, GPIO_MAX_PIN);
 }
 
-void gpio_useAsAlt5(uint pin_number)
+void
+gpio_useAsAlt5(uint32_t pin_number)
 {
 	gpio_pull(pin_number, Pull_None);
 	gpio_function(pin_number, GPIO_FUNCTION_ALT5);
 }
 
 
-void uart_init()
+void 
+uart_init()
 {
 	mmio_write(AUX_ENABLES, 1); //enable UART1
 	mmio_write(AUX_MU_IER_REG, 0);
@@ -79,27 +101,31 @@ void uart_init()
 	mmio_write(AUX_MU_CNTL_REG, 3); //enable RX/TX
 }
 
-uint uart_isWriteByteReady()
+uint32_t 
+uart_isWriteByteReady()
 {
 	return mmio_read(AUX_MU_LSR_REG) & 0x20;
 }
 
-uint uart_isReadByteReady(){
+uint32_t 
+uart_isReadByteReady(){
 	return mmio_read(AUX_MU_LSR_REG) & 0x01;
 }
 
-uint uart_readIntBlocking()
+uint32_t 
+uart_readIntBlocking()
 {
-	uint num;
+	uint32_t num;
 	for (int i=0; i<4;i++) {
 		char c = uart_readByteBlocking();
 		num = num << 8;
-		num += (uint) c;
+		num += (uint32_t) c;
 	}
 	return num;
 }
 
-void uart_sendInt(uint num)
+void 
+uart_sendInt(uint32_t num)
 {
 	uart_writeByteBlocking((char) ((num >> 24)));
 	uart_writeByteBlocking((char) ((num >> 16)));
@@ -107,13 +133,15 @@ void uart_sendInt(uint num)
 	uart_writeByteBlocking((char) ((num)));
 }
 
-void uart_writeByteBlocking(unsigned char ch)
+void 
+uart_writeByteBlocking(unsigned char ch)
 {
 	while (!uart_isWriteByteReady()); 
-	mmio_write(AUX_MU_IO_REG, (uint)ch);
+	mmio_write(AUX_MU_IO_REG, (uint32_t)ch);
 }
 
-void uart_writeText(char *buffer)
+void 
+uart_writeText(char *buffer)
 {
 	while (*buffer) {
 		 if (*buffer == '\n') 
@@ -122,14 +150,16 @@ void uart_writeText(char *buffer)
 	}
 }
 
-unsigned char uart_readByteBlocking()
+unsigned char 
+uart_readByteBlocking()
 {
 	while (!uart_isReadByteReady());
 	return (unsigned char)mmio_read(AUX_MU_IO_REG);
 }
 
 
-int uart_readByte(char* byte)
+int 
+uart_readByte(char* byte)
 {
 	if (uart_isReadByteReady()) {
 		*byte = (unsigned char)mmio_read(AUX_MU_IO_REG);
@@ -139,7 +169,8 @@ int uart_readByte(char* byte)
 	}
 }
 
-bool readString(char *buff)
+bool 
+readString(char *buff)
 {
 	unsigned char c;
 	while(*buff) {

@@ -10,19 +10,23 @@
 #include "procconf.h"
 #include "error.h"
 #include "tasks.h"
-#include "types.h"
+#include "syscall.h"
 
 
 void os_idle(void);
 
-void main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
+void main(
+	uint64_t dtb_ptr32,
+	uint64_t x1,
+	uint64_t x2,
+	uint64_t x3)
 {
 	(void) dtb_ptr32;
 	(void) x1;
 	(void) x2;
 	(void) x3;
 	
-	volatile uint exceptionLevel = getExceptionLevel();
+	volatile uint32_t exceptionLevel = getExceptionLevel();
 	init_vector_table();
  
 	// init the interrupt controller
@@ -45,9 +49,11 @@ void main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 
 void os_entry()
 {
-	volatile uint exceptionLevel = getExceptionLevel();
+	volatile uint32_t exceptionLevel = getExceptionLevel();
 	uart_init();
 	enable_irq();
+	volatile uint32_t stop = 1;
+	//while(stop){};
 	timer_init();
 
 	uart_writeText("Kernel running! \n");
@@ -59,9 +65,9 @@ void os_entry()
 	else if(exceptionLevel == 3)
 		uart_writeText("Running at EL3 \n");
 	
-	fork((ulong) &process, (ulong) "Task 1\n");
-	fork((ulong) &process, (ulong) "Task 2\n");
-
+	fork((unsigned long) &process, (unsigned long) "Task 1\n");
+	fork((unsigned long) &process, (unsigned long) "Task 2\n");
+	fork((unsigned long) &suspended, 0ul);
 	os_idle();
 }
 

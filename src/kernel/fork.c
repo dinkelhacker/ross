@@ -1,5 +1,5 @@
 #include "error.h"
-#include "types.h"
+#include <stdint.h>
 #include "tasks.h"
 #include "memory_layout.h"
 #include "scheduler.h"
@@ -9,14 +9,14 @@ extern void ret_from_fork(void);
 
 #define THREAD_SIZE 4096
 
-int fork(ulong fn_addr, ulong args)
+int fork(unsigned long fn_addr, unsigned long args)
 {
 	
 	// disable preemption during the fork
 	disable_preemption();
 
 	//allocate a new task struct
-	struct task_struct *p = get_free_page();
+	task_struct *p = (task_struct *) get_free_page();
 	if(!p)
 		return ERROR;
 
@@ -35,8 +35,8 @@ int fork(ulong fn_addr, ulong args)
 
 	// setup pc so we will immediately execute the schedule tail
 	// and return form fork
-	p->cpu_context.pc = (ulong) ret_from_fork;
-	p->cpu_context.sp = (ulong) p + PAGE_SIZE;
+	p->cpu_context.pc = (unsigned long) ret_from_fork;
+	p->cpu_context.sp = (unsigned long) p + PAGE_SIZE;
 
 	int pid = nr_tasks++;
 	p->pid = pid;

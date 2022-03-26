@@ -1,6 +1,6 @@
 #include "gic400.h"
-#include "types.h"
 #include "error.h"
+#include <stdint.h>
 
 typedef struct {
 		gic400_gicd_t* gicd;
@@ -9,14 +9,14 @@ typedef struct {
 
 static gic400_t gic400;
 
-void gicd_enableir(uint irid);
-int gicd_groupir(uint irid, uint group);
-int gicd_irtarget(uint irid, uint cpuid);
-int gicd_ctrl(uint mode);
-int gicc_ctrl(uint mode);
-int gic_ctrl(uint mode, uint* ctl);
+void gicd_enableir(uint32_t irid);
+int gicd_groupir(uint32_t irid, uint32_t group);
+int gicd_irtarget(uint32_t irid, uint32_t cpuid);
+int gicd_ctrl(uint32_t mode);
+int gicc_ctrl(uint32_t mode);
+int gic_ctrl(uint32_t mode, uint32_t* ctl);
 
-int gic400_init(void* interrupt_controller_base)
+int gic400_init(void *interrupt_controller_base)
 {
 	int error = OK;
 
@@ -42,30 +42,30 @@ int gic400_init(void* interrupt_controller_base)
 	return error;
 }
 
-//void gicd_icfg(uint irid, uint mode){
+//void gicd_icfg(uint32_t irid, uint32_t mode){
 //  if(mode > 1)
 //    return ERROR;
 //
 //  gicd400.gicd->icfg[irid/16] = 
 //}
 
-void gicd_enableir(uint irid)
+void gicd_enableir(uint32_t irid)
 {
 	gic400.gicd->isenable[irid/32] |= 0x1 << (irid % 32);
 }
 
-int gicd_groupir(uint irid, uint group)
+int gicd_groupir(uint32_t irid, uint32_t group)
 {
 	if(group>1)
 			return ERROR;
 
-	uint groupv = (group == 1)? 0x1:0x0;
+	uint32_t groupv = (group == 1)? 0x1:0x0;
 	gic400.gicd->igroup[irid/32] |= groupv << (irid % 32);
 
 	return OK;
 }
 
-int gicd_irtarget(uint irid, uint cpuid)
+int gicd_irtarget(uint32_t irid, uint32_t cpuid)
 {
 	if(cpuid > 3)
 			return ERROR;
@@ -75,19 +75,19 @@ int gicd_irtarget(uint irid, uint cpuid)
 	return OK;
 }
 
-int gicd_ctrl(uint mode)
+int gicd_ctrl(uint32_t mode)
 {
-	return gic_ctrl(mode, &(gic400.gicd->ctl));
+	return gic_ctrl(mode, (uint32_t *) &(gic400.gicd->ctl));
 }
 
-int gicc_ctrl(uint mode)
+int gicc_ctrl(uint32_t mode)
 {
-	return gic_ctrl(mode, &(gic400.gicc->ctl));
+	return gic_ctrl(mode, (uint32_t *) &(gic400.gicc->ctl));
 }
 
-int gic_ctrl(uint mode, uint* ctl)
+int gic_ctrl(uint32_t mode, uint32_t* ctl)
 {
-	uint tmp = *ctl;
+	uint32_t tmp = *ctl;
 	*ctl |= mode;
 
 	// check if we had the right permissions to set the ctl bits
@@ -98,12 +98,12 @@ int gic_ctrl(uint mode, uint* ctl)
 }
 
 // acknowledge pending irq
-uint gicc_apirq()
+uint32_t gicc_apirq()
 {
 	return gic400.gicc->ia;
 }
 
-void gicc_eoi(uint irid)
+void gicc_eoi(uint32_t irid)
 {
 	gic400.gicc->eoi = irid;
 }

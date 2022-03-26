@@ -145,7 +145,12 @@ serror_el1t:
 
 	// EL1h
 sync_el1h:
-	handle_exception SYNC_EL1H,     handle_sync_el1h
+	store_processor_state
+	mrs  x0, esr_el1
+	mrs  x1, elr_el1 
+	mov x2, x8
+	bl handle_sync_el1h
+	restore_processor_state
 
 irq_el1h:
 	handle_exception IRQ_EL1H,      handle_irq_el1h
