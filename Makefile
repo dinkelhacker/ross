@@ -1,8 +1,8 @@
 # Don't us normal gcc, use the arm cross compiler
-CC = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc
-LD  = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-ld
-OBJCPY  = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-objcopy
-ASM = ./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc
+CC = ./build/gcc-arm/bin/aarch64-none-elf-gcc
+LD  = ./build/gcc-arm/bin/aarch64-none-elf-ld
+OBJCPY  = ./build/gcc-arm/bin/aarch64-none-elf-objcopy
+ASM = ./build/gcc-arm/bin/aarch64-none-elf-gcc
 
 CFLAGS = -g3 -mcpu=cortex-a72 -fpic -ffreestanding
 AFLAGS = -D_ASM_
@@ -111,15 +111,15 @@ run-debug: all
 	qemu-system-aarch64 -m 4096 -M raspi4 -serial /dev/null -serial stdio -s -S -kernel ./build/$(KERNEL_NAME).img
 
 debug:
-	./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gdb -ex 'target remote 127.0.0.1:1234' ./build/$(KERNEL_NAME).elf
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target remote 127.0.0.1:1234' ./build/$(KERNEL_NAME).elf
 
 run-debug-target: 
 	sudo openocd -f ./tools/adafruit.cfg  -f ./tools/raspi4.cfg 
 
 debug-target-kernel:
-	./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(KERNEL_NAME).elf
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(KERNEL_NAME).elf
 
 debug-target-bootloader:
-	./build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(BOOTLOADER_NAME).elf
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(BOOTLOADER_NAME).elf
 
 

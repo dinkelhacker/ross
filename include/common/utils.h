@@ -1,4 +1,4 @@
 #ifndef UTILS_H
 #define UTILS_H
-unsigned int atoi(char *string);
+void print_current_el(void);
 #endif

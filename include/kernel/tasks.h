@@ -33,6 +33,15 @@ typedef struct task_struct {
 	long pid;
 } task_struct;
 
+// TODO: move?
+/* Full processor state as it is expected during kernel enter/exit. */
+typedef struct processor_state {
+	unsigned long x[31]; /* Registers x0 - x30 */
+	unsigned long sp;
+	unsigned long pc;
+	unsigned long pstate;
+} processor_state;
+
 
 #define TASK_RUNNING 1
 
@@ -42,6 +51,9 @@ extern struct task_struct * task[5];
 extern int nr_tasks;
 
 extern void process(char* string);
+void 
+transition_process(unsigned long fn);
+
 extern int fork(unsigned long fn_addr, unsigned long args);
 extern void suspended(void);
 #endif

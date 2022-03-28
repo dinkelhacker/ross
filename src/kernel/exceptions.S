@@ -3,18 +3,23 @@
 // This macro is used to create an entry in the vector table.
 // In Aarch64 vectors are each 0x80 (2^7) bytes apart.
 
- .macro vector_entry label
+.macro vector_entry label
 	.align 7 
 	b \label
 .endm
 
-.macro handle_exception type handler
-	store_processor_state
+.macro handle_exception type handler el
+	store_processor_state \el
 	mov  x0, #\type
 	mrs  x1, esr_el1
 	mrs  x2, elr_el1 
+	clear_esr
 	bl \handler 
-	restore_processor_state
+	restore_processor_state \el
+.endm
+
+.macro clear_esr
+	msr esr_el1, xzr
 .endm
 
 /*
@@ -34,7 +39,7 @@
  *       --------
  */
 
-.macro store_processor_state
+.macro store_processor_state el
 	// make space for the frame
 	sub  sp, sp, #STORED_FRAME_SIZE
 
@@ -55,28 +60,37 @@
 	stp  x26, x27, [sp, #16 * 13]
 	stp  x28, x29, [sp, #16 * 14]
 
+	.if	\el == 0
+	mrs	x21, sp_el0
+	.else
+	add	x21, sp, #STORED_FRAME_SIZE
+	.endif
+
 	// store pc of the interrupted task in x22
 	mrs	x22, elr_el1
 	// store saved program status register in x23
 	mrs	x23, spsr_el1
 
-	// push 'em also on the stack (and x30 which was left over)
-	stp	x30, x22, [sp, #16 * 15] 
-	str	x23, [sp, #16 * 16] 
+	stp	x30, x21, [sp, #16 * 15] 
+	stp	x22, x23, [sp, #16 * 16] 
 .endm
 
 
-.macro  restore_processor_state
+.macro  restore_processor_state el
 	// get saved program status
-	ldr	x23, [sp, #16 * 16]
+	ldp	x22, x23, [sp, #16 * 16]
 	// get pc of the previously interrupted task (x22) and x30
-	ldp	x30, x22, [sp, #16 * 15] 
+	ldp	x30, x21, [sp, #16 * 15] 
+
+	.if	\el == 0
+	msr	sp_el0, x21
+	.endif
 
 	// put address in exception link register
 	msr	elr_el1, x22
 	// restore program status
 	msr	spsr_el1, x23
-	
+
 	// restore all the registers
 	ldp  x0, x1, [sp, #16 * 0]
 	ldp  x2, x3, [sp, #16 * 1]
@@ -131,63 +145,70 @@ vectors:
 
 // EL1t
 sync_el1t:
-	handle_exception SYNC_EL1T,     handle_sync_el1t
+	handle_exception SYNC_EL1T, invalid_exception, 1 
 
 irq_el1t:
-	handle_exception IRQ_EL1T,      handle_irq_el1t
+	handle_exception IRQ_EL1T, invalid_exception, 1
 
 fiq_el1t:
-	handle_exception FIQ_EL1T,      handle_fiq_el1t
+	handle_exception FIQ_EL1T, invalid_exception, 1
 
 serror_el1t:
-	handle_exception SERROR_EL1T,   handle_serror_el1t
+	handle_exception SERROR_EL1T,invalid_exception, 1
 
 
-	// EL1h
+// EL1h
 sync_el1h:
-	store_processor_state
+	store_processor_state 1
 	mrs  x0, esr_el1
 	mrs  x1, elr_el1 
+	clear_esr
 	mov x2, x8
-	bl handle_sync_el1h
-	restore_processor_state
+	bl handle_sync
+	restore_processor_state 1
 
 irq_el1h:
-	handle_exception IRQ_EL1H,      handle_irq_el1h
+	handle_exception IRQ_EL1H, handle_irq, 1
 
 fiq_el1h:
-	handle_exception FIQ_EL1H,      handle_fiq_el1h
+	handle_exception FIQ_EL1H, invalid_exception, 1
 
 serror_el1h:
-	handle_exception SERROR_EL1H,   handle_serror_el1h
+	handle_exception SERROR_EL1H, invalid_exception, 1
 
 
 // EL0_64
 sync_el0_64:
-	handle_exception SYNC_EL0_64,   handle_sync_el0_64
+	store_processor_state 0
+	mrs x0, esr_el1
+	mrs x1, elr_el1 
+	clear_esr
+	mov x2, x8
+	bl handle_sync
+	restore_processor_state 0
 
 irq_el0_64:
-	handle_exception IRQ_EL0_64,    handle_irq_el0_64
+	handle_exception IRQ_EL0_64, handle_irq, 0
 
 fiq_el0_64:
-	handle_exception FIQ_EL0_64,    handle_fiq_el0_64
+	handle_exception FIQ_EL0_64, invalid_exception, 0
 
 serror_el0_64:
-	handle_exception SERROR_EL0_64, handle_serror_el0_64
+	handle_exception SERROR_EL0_64, invalid_exception, 0
 
 
 // EL0_32
 sync_el0_32:
-	handle_exception SYNC_EL0_32,   handle_sync_el0_32
+	handle_exception SYNC_EL0_32, invalid_exception, 0
 
 irq_el0_32:
-	handle_exception IRQ_EL0_32,    handle_irq_el0_32
+	handle_exception IRQ_EL0_32, invalid_exception, 0
 
 fiq_el0_32:
-	handle_exception FIQ_EL0_32,    handle_fiq_el0_32
+	handle_exception FIQ_EL0_32, invalid_exception, 0
 
 serror_el0_32:
-	handle_exception SERROR_EL0_32, handle_serror_el0_32
+	handle_exception SERROR_EL0_32, invalid_exception, 0
 
 // Set vector table base address
 .section ".text"
@@ -208,3 +229,15 @@ enable_irq:
 disable_irq:
 	msr daifset, #2
 	ret
+
+.globl ret_from_fork
+ret_from_fork:
+	// enable preemption
+	bl    schedule_tail
+	// restore argument
+	mov    x0, x20
+	// bye bye...
+	blr    x19
+ret_to_user:
+	bl disable_irq				
+	restore_processor_state 0 

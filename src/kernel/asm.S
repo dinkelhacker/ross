@@ -1,16 +1,6 @@
 .section ".text"
-.globl ret_from_fork
 
 #include "tasks.h"
-
-ret_from_fork:
-	// enable preemption
-	bl    schedule_tail
-	// restore argument
-	mov    x0, x20
-	// bye bye...
-	blr    x19
-
 
 /* 
  * This function performs the actual context switch.
