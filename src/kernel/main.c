@@ -68,6 +68,7 @@ void os_entry()
 	fork((unsigned long) &process, (unsigned long) "Task 1\n");
 	fork((unsigned long) &process, (unsigned long) "Task 2\n");
 	fork((unsigned long) &transition_process,(unsigned long) &suspended);
+	fork((unsigned long) &reset_device, 0ul);
 	os_idle();
 }
 

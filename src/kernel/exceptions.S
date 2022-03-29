@@ -159,13 +159,7 @@ serror_el1t:
 
 // EL1h
 sync_el1h:
-	store_processor_state 1
-	mrs  x0, esr_el1
-	mrs  x1, elr_el1 
-	clear_esr
-	mov x2, x8
-	bl handle_sync
-	restore_processor_state 1
+	handle_exception SYNC_EL1H, handle_sync, 1
 
 irq_el1h:
 	handle_exception IRQ_EL1H, handle_irq, 1
@@ -179,13 +173,7 @@ serror_el1h:
 
 // EL0_64
 sync_el0_64:
-	store_processor_state 0
-	mrs x0, esr_el1
-	mrs x1, elr_el1 
-	clear_esr
-	mov x2, x8
-	bl handle_sync
-	restore_processor_state 0
+	handle_exception SYNC_EL0_64, handle_sync, 0
 
 irq_el0_64:
 	handle_exception IRQ_EL0_64, handle_irq, 0
@@ -241,3 +229,8 @@ ret_from_fork:
 ret_to_user:
 	bl disable_irq				
 	restore_processor_state 0 
+
+.globl get_syscall_id
+get_syscall_id:
+	mov x0, x8
+	ret

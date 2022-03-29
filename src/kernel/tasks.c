@@ -8,9 +8,10 @@
 #include "utils.h"
 #include <stdint.h>
 #include "mm.h"
+#include "peripherals.h"
 
 #include "exceptions.h"
-
+static volatile uint32_t reset = 0;
 static struct task_struct init_task =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 #define EL0t 0x00000000
 
@@ -37,6 +38,20 @@ process(char *string)
 	}
 }
 
+
+void
+reset_device(void)
+{
+	while(1) {
+		if(reset){
+			mmio_write(PM_WDOG, PM_PASSWORD | 1);
+			mmio_write(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
+		}
+
+		delay(1000000);
+	}
+}
+
 void 
 transition_process(unsigned long fn)
 {
@@ -53,6 +68,8 @@ transition_process(unsigned long fn)
 void
 suspended(void)
 {
+
+
 	uart_writeText("Suspended 1\n");
 	syscall(SYSC_TASK_SUSPEND);
 	uart_writeText("Suspended 2\n");

@@ -50,11 +50,18 @@ extern struct task_struct *current;
 extern struct task_struct * task[5];
 extern int nr_tasks;
 
-extern void process(char* string);
-void 
+extern void
+process(char* string);
+
+extern void 
 transition_process(unsigned long fn);
 
+extern void 
+suspended(void);
+
+extern void 
+reset_device(void);
+
 extern int fork(unsigned long fn_addr, unsigned long args);
-extern void suspended(void);
 #endif
 #endif

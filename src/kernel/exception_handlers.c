@@ -9,6 +9,15 @@
 #include "exceptions.h"
 #include "syscall.h"
 
+#define EC_SHIFT 26
+#define EC_MASK ((uint8_t) 0x3f)
+#define EC_SVC 0x15
+
+static uint8_t get_exception_class(uint32_t esr)
+{
+	return ((uint8_t)(esr >> EC_SHIFT)) & EC_MASK;	
+}
+
 void
 invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
 {
@@ -19,14 +28,10 @@ invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
 }
 
 void
-handle_sync(unsigned long esr, unsigned long address, uint32_t sysid)
+handle_syscall(uint32_t exception_type, uint32_t sysid)
 {
-	(void) esr;
-	(void) address;
-	(void) sysid;
-	//TODO: 
-	//	- check esr if caused by SVC
-	//	- maybe just grab the esr from here instead of passing it
+	(void) exception_type;
+
 	switch (sysid){
 	case SYSC_TASK_SUSPEND:
 		enable_irq();
@@ -34,6 +39,29 @@ handle_sync(unsigned long esr, unsigned long address, uint32_t sysid)
 		scheduler();
 		disable_irq();
 	}
+}
+
+
+void
+handle_sync(uint32_t type, unsigned long esr, unsigned long address)
+{
+	(void) esr;
+	(void) address;
+
+	//TODO: 
+	//	- check esr if caused by SVC
+	//	- maybe just grab the esr from here instead of passing it
+	switch(get_exception_class(esr)){
+	case EC_SVC:
+	{
+		uint32_t sysid = get_syscall_id();
+		handle_syscall(type, sysid);
+	}
+	break;
+	default:
+		while(1);
+	}
+
 
 	// syscalls will land here
 }
