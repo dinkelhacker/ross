@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "gpio.h"
 #include "io.h"
 #include "asm_utils.h"
 #include "exceptions.h"
@@ -53,7 +54,17 @@ void os_entry()
 	uart_init();
 	enable_irq();
 	volatile uint32_t stop = 1;
-	//while(stop){};
+	while(stop){};
+	gpio_set_pull(16, GPIO_P_DOWN);
+	gpio_function_select(16, GPIO_F_IN);
+	volatile uint32_t vp = gpio_get_lvl(16);
+	 vp = gpio_get_lvl(16);
+	 vp = gpio_get_lvl(16);
+	//gpio_clear_pin(16);
+	//vp = gpio_get_lvl(16);
+	//gpio_set_pin(16);
+	//vp = gpio_get_lvl(16);
+	
 	timer_init();
 
 	uart_writeText("Kernel running! \n");

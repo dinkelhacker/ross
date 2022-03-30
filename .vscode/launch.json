@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/kernel.elf",
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath":"${workspaceFolder}/build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gdb",
+            "miDebuggerPath":"${workspaceFolder}/build/gcc-arm/bin/aarch64-none-elf-gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

@@ -1,4 +1,5 @@
 #include "io.h"
+#include "gpio.h"
 #include "peripherals.h"
 #include <stdbool.h>
 #include "error.h"
@@ -20,69 +21,11 @@ mmio_read(long reg)
 	return *(volatile uint32_t *) reg;
 }
 
-uint32_t
-gpio_call(
-	uint32_t pin_number,
-	uint32_t value,
-	uint32_t base,
-	uint32_t field_size,
-	uint32_t field_max)
-{
-	uint32_t field_mask = (1 << field_size) - 1;
-
-	if (pin_number > field_max) return 0;
-	if (value > field_mask) return 0; 
-
-	uint32_t num_fields = 32 / field_size;
-	uint32_t reg = base + ((pin_number / num_fields) * 4);
-	uint32_t shift = (pin_number % num_fields) * field_size;
-
-	uint32_t curval = mmio_read(reg);
-	curval &= ~(field_mask << shift);
-	curval |= value << shift;
-	mmio_write(reg, curval);
-
-	return 1;
-}
-
-
-uint32_t 
-gpio_set(
-	uint32_t pin_number,
-	uint32_t value)
-{
-	return gpio_call(pin_number, value, GPSET0, 1, GPIO_MAX_PIN);
-}
-
-uint32_t
-gpio_clear(
-	uint32_t pin_number,
-	uint32_t value)
-{
-	return gpio_call(pin_number, value, GPCLR0, 1, GPIO_MAX_PIN);
-}
-
-uint32_t 
-gpio_pull(
-	uint32_t pin_number,
-	uint32_t value)
-{
-	return gpio_call(pin_number, value, GPPUPPDN0, 2, GPIO_MAX_PIN);
-}
-
-uint32_t
-gpio_function(
-	uint32_t pin_number,
-	uint32_t value)
-{
-	return gpio_call(pin_number, value, GPFSEL0, 3, GPIO_MAX_PIN);
-}
-
 void
 gpio_useAsAlt5(uint32_t pin_number)
 {
-	gpio_pull(pin_number, Pull_None);
-	gpio_function(pin_number, GPIO_FUNCTION_ALT5);
+	gpio_set_pull(pin_number, GPIO_P_NONE);
+	gpio_function_select(pin_number, GPIO_F_ALT5);
 }
 
 
@@ -97,8 +40,10 @@ uart_init()
 	mmio_write(AUX_MU_IER_REG, 0);
 	mmio_write(AUX_MU_IIR_REG, 0xC6); //disable interrupts
 	mmio_write(AUX_MU_BAUD_REG, AUX_MU_BAUD(115200));
-	gpio_useAsAlt5(14);
-	gpio_useAsAlt5(15);
+	gpio_set_pull(14, GPIO_P_NONE);
+	gpio_set_pull(15, GPIO_P_NONE);
+	gpio_function_select(14, GPIO_F_ALT5);
+	gpio_function_select(15, GPIO_F_ALT5);
 	mmio_write(AUX_MU_CNTL_REG, 3); //enable RX/TX
 }
 

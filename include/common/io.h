@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-extern uint32_t gpio_get(uint32_t pin_number);
 extern void uart_init();
 extern void uart_writeText(char *buffer);
 extern unsigned int uart_readIntBlocking();
