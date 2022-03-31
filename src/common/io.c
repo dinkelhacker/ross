@@ -21,14 +21,6 @@ mmio_read(long reg)
 	return *(volatile uint32_t *) reg;
 }
 
-void
-gpio_useAsAlt5(uint32_t pin_number)
-{
-	gpio_set_pull(pin_number, GPIO_P_NONE);
-	gpio_function_select(pin_number, GPIO_F_ALT5);
-}
-
-
 void 
 uart_init()
 {

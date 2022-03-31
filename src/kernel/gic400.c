@@ -1,5 +1,6 @@
 #include "gic400.h"
 #include "error.h"
+#include "irids.h"
 #include <stdint.h>
 
 typedef struct {
@@ -31,6 +32,10 @@ int gic400_init(void *interrupt_controller_base)
 	gicd_enableir(97);
 	gicd_groupir(97,1);
 	gicd_irtarget(97, 0);
+
+	gicd_enableir(IRID_GPIO_BANK0);
+	gicd_groupir(IRID_GPIO_BANK0, 1);
+	gicd_irtarget(IRID_GPIO_BANK0, 0);
 
 	gic400.gicd->icfg[6] = 0x00000000;
 

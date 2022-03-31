@@ -53,18 +53,11 @@ void os_entry()
 	volatile uint32_t exceptionLevel = getExceptionLevel();
 	uart_init();
 	enable_irq();
-	volatile uint32_t stop = 1;
-	while(stop){};
+
 	gpio_set_pull(16, GPIO_P_DOWN);
 	gpio_function_select(16, GPIO_F_IN);
-	volatile uint32_t vp = gpio_get_lvl(16);
-	 vp = gpio_get_lvl(16);
-	 vp = gpio_get_lvl(16);
-	//gpio_clear_pin(16);
-	//vp = gpio_get_lvl(16);
-	//gpio_set_pin(16);
-	//vp = gpio_get_lvl(16);
-	
+	gpio_high_level_detect(16,1);
+
 	timer_init();
 
 	uart_writeText("Kernel running! \n");
@@ -79,7 +72,7 @@ void os_entry()
 	fork((unsigned long) &process, (unsigned long) "Task 1\n");
 	fork((unsigned long) &process, (unsigned long) "Task 2\n");
 	fork((unsigned long) &transition_process,(unsigned long) &suspended);
-	fork((unsigned long) &reset_device, 0ul);
+	//fork((unsigned long) &reset_device, 0ul);
 	os_idle();
 }
 

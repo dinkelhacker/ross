@@ -3,5 +3,6 @@
 
 // IRIDs
 #define IRID_SYSTIMER   97
+#define IRID_GPIO_BANK0 145
 
 #endif 

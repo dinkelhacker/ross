@@ -1,5 +1,6 @@
 #include "exception_types.h"
 #include "io.h"
+#include "gpio.h"
 #include "peripherals.h"
 #include "irids.h"
 #include "gic400.h"
@@ -87,6 +88,13 @@ handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 			enable_irq();
 			scheduler();
 			disable_irq();
+		break;
+		case IRID_GPIO_BANK0:
+			uart_writeText("GPIO Interrupt\n");
+			gicc_eoi(IRID_GPIO_BANK0);
+			gpio_clear_event(16);
+			mmio_write(PM_WDOG, PM_PASSWORD | 1);
+			mmio_write(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
 		break;
 		default:
 			uart_writeText("Unknown Interrupt\n");
