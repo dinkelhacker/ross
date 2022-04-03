@@ -3,5 +3,7 @@
 #include <stdint.h>
 
 extern void jumpToAddr(void*);
-extern uint32_t getExceptionLevel();
+extern uint32_t getExceptionLevel(void);
+extern uint32_t get_core_id(void);
+extern void wakeup_cores(void);
 #endif

@@ -19,8 +19,7 @@ static uint8_t get_exception_class(uint32_t esr)
 	return ((uint8_t)(esr >> EC_SHIFT)) & EC_MASK;	
 }
 
-void
-invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
+void invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
 {
 	(void) type;
 	(void) esr;
@@ -28,8 +27,7 @@ invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
 	while(1);
 }
 
-void
-handle_syscall(uint32_t exception_type, uint32_t sysid)
+void handle_syscall(uint32_t exception_type, uint32_t sysid)
 {
 	(void) exception_type;
 
@@ -43,15 +41,10 @@ handle_syscall(uint32_t exception_type, uint32_t sysid)
 }
 
 
-void
-handle_sync(uint32_t type, unsigned long esr, unsigned long address)
+void handle_sync(uint32_t type, unsigned long esr, unsigned long address)
 {
-	(void) esr;
 	(void) address;
 
-	//TODO: 
-	//	- check esr if caused by SVC
-	//	- maybe just grab the esr from here instead of passing it
 	switch(get_exception_class(esr)){
 	case EC_SVC:
 	{
@@ -67,8 +60,7 @@ handle_sync(uint32_t type, unsigned long esr, unsigned long address)
 	// syscalls will land here
 }
 
-void
-handle_irq(uint32_t type, unsigned long esr, unsigned long address)
+void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 {
 	(void) type;
 	(void) esr;
@@ -79,20 +71,22 @@ handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 		switch (irid) {
 		case IRID_SYSTIMER:
 			uart_writeText("Timer Interrupt\n");
-			// reset the timer
+			/* Reset the timer */
 			timer_init();
-			// clear the interrupt otherwise it won't be fired again
+			/* Clear the interrupt otherwise it won't be fired again.*/
 			gicc_eoi(IRID_SYSTIMER);
-
-			//call the scheduler with interrupts enabled (disabled in an execption handler)
+			/* Call the scheduler with interrupts enabled 
+			 * (disabled in an execption handler) */
 			enable_irq();
 			scheduler();
 			disable_irq();
 		break;
 		case IRID_GPIO_BANK0:
-			uart_writeText("GPIO Interrupt\n");
+			/* Clear the irq in the gic. */
 			gicc_eoi(IRID_GPIO_BANK0);
+			/* Clear the gpio event register, or it will be fired again.*/
 			gpio_clear_event(16);
+			/* Let the (Watch)Dog out ;)! */
 			mmio_write(PM_WDOG, PM_PASSWORD | 1);
 			mmio_write(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
 		break;

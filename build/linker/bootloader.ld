@@ -3,6 +3,19 @@ ENTRY(_start)
  
 SECTIONS
 {
+    . = CORE_RELEASE;
+    __core_start = .;
+    .core_release_block CORE_RELEASE:
+    {
+	KEEP(*(.core_release_section))
+    }
+    __core_end= .;
+
+
+    _stack_core0 = BOOTLOADER_BASE;
+    _stack_core1 = BOOTLOADER_BASE - 0x2000;
+    _stack_core2 = BOOTLOADER_BASE - 0x4000;
+    _stack_core3 = BOOTLOADER_BASE - 0x6000;
     /* Starts at BOOTLOADER_BASE. */
     . = BOOTLOADER_BASE;
     __start = .;

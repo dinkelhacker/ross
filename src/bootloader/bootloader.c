@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "io.h"
 #include "kernel_loader.h"
+#include "memory_layout.h"
  
 void bootloader_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 {
@@ -20,4 +21,12 @@ void bootloader_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 		// echo
 		uart_writeByteBlocking(uart_readByteBlocking()); 
 	}
+}
+
+
+void waiting_core()
+{
+	volatile uint32_t *p =  CORE_RELEASE;
+	while(*p != 0xabcdef){};
+	uart_writeText("Released!");
 }

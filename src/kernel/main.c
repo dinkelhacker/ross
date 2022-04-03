@@ -12,6 +12,8 @@
 #include "error.h"
 #include "tasks.h"
 #include "syscall.h"
+#include "utils.h"
+#include "memory_layout.h"
 
 
 void os_idle(void);
@@ -50,29 +52,32 @@ void main(
 
 void os_entry()
 {
-	volatile uint32_t exceptionLevel = getExceptionLevel();
+	/* Init peripherals, system timer and enable IRQs */
 	uart_init();
-	enable_irq();
-
-	gpio_set_pull(16, GPIO_P_DOWN);
-	gpio_function_select(16, GPIO_F_IN);
-	gpio_high_level_detect(16,1);
+	
+	/* Generate interrupt if pin 16 is `high` (for "reset pin"). */
+	(void) gpio_set_pull(16, GPIO_P_DOWN);
+	(void) gpio_function_select(16, GPIO_F_IN);
+	(void) gpio_high_level_detect(16,1);
 
 	timer_init();
+	enable_irq();
 
 	uart_writeText("Kernel running! \n");
+	print_current_el();
+	print_core_id();
+	volatile int stop = 1;
+	while(stop){};
+	uint32_t *p = CORE_RELEASE;
+	*p =0xabcdef;
 
-	if(exceptionLevel == 1)
-		uart_writeText("Running at EL1 \n");
-	else if(exceptionLevel == 2)
-		uart_writeText("Running at EL2 \n");
-	else if(exceptionLevel == 3)
-		uart_writeText("Running at EL3 \n");
-	
-	fork((unsigned long) &process, (unsigned long) "Task 1\n");
-	fork((unsigned long) &process, (unsigned long) "Task 2\n");
-	fork((unsigned long) &transition_process,(unsigned long) &suspended);
-	//fork((unsigned long) &reset_device, 0ul);
+	/* Fork some kernel tasks. */
+	(void) fork((unsigned long) &process, (unsigned long) "Task 1\n");
+	(void) fork((unsigned long) &process, (unsigned long) "Task 2\n");
+	/* User space task. */
+	(void) fork((unsigned long) &transition_process,(unsigned long) &suspended);
+
+	/* Go to the os idle loop. */
 	os_idle();
 }
 

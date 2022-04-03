@@ -120,7 +120,8 @@ debug-target-kernel:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(KERNEL_NAME).elf
 
 debug-target-bootloader:
-	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(BOOTLOADER_NAME).elf
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3334' ./build/$(BOOTLOADER_NAME).elf
 reset:
 	echo "ftdi_set_signal nSRST 1" | nc localhost 4444
+	echo "ftdi_set_signal nSRST 0" | nc localhost 4444
 

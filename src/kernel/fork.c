@@ -9,8 +9,7 @@ extern void ret_from_fork(void);
 
 #define THREAD_SIZE 4096
 
-int
-fork(unsigned long fn_addr, unsigned long args)
+int fork(unsigned long fn_addr, unsigned long args)
 {
 	
 	// disable preemption during the fork

@@ -19,18 +19,13 @@ typedef enum {
 	GPIO_P_DOWN	= 0x2,
 } gpio_pull;
 
+extern int gpio_function_select(uint8_t pin, gpio_function fun);
 
-void set_bfield_in_reg(
-	uint32_t reg, 	uint32_t field_size,
-	uint32_t value, uint32_t shift);
+extern int gpio_set_pin(uint8_t pin);
 
-extern void gpio_function_select(uint8_t pin, gpio_function fun);
+extern int gpio_clear_pin(uint8_t pin);
 
-extern void gpio_set_pin(uint8_t pin);
-
-extern void gpio_clear_pin(uint8_t pin);
-
-extern void gpio_set_pull(uint8_t pin, gpio_pull pull);
+extern int gpio_set_pull(uint8_t pin, gpio_pull pull);
 
 extern int gpio_get_lvl(uint8_t pin);
 

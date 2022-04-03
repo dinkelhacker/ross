@@ -13,21 +13,32 @@
 _start:
 	// Check processor ID is zero (executing on main core), else hang
 	// Copy system register `mpidr_el1` into x1
-	mrs     x1, mpidr_el1
+	mrs     x2, mpidr_el1
 	// and x1 with 0b11
-	and     x1, x1, #3
+	and     x1, x2, #3
 	// If core `0` go to `_mainCore`
 	cbz     x1, _mainCore
 	
-_halt:  
-	// `WaitForEvent` suspend the core until an event occures 
-	wfe
-	b      _halt 
+// Not main cores
+	//wfe
+	//b     idle 
+	ldr 	x5, =_stack_core1
+	cmp 	x1, #1
+	beq 	_other_cores
+	ldr 	x5, =_stack_core2
+	cmp	x1, #2
+	beq 	_other_cores
+	ldr 	x5, =_stack_core3
+	cmp	x1, #3
+	beq 	_other_cores
+_other_cores:
+	mov   sp, x5
+	b waiting_core
+
 
 _mainCore: 
 	// Main core
-	// Set stack before our code
-	ldr   x5, =_start
+	ldr   x5, =_stack_core0
 	mov   sp, x5
 	
 	// clear bss
@@ -42,4 +53,6 @@ _mainCore:
 	// jump to C code, should not return
 2:  bl    bootloader_main
 	// for failsafe, halt this core too
+	b _halt
+_halt:
 	b _halt

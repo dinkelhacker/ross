@@ -7,6 +7,7 @@
 #define KERNEL_BASE       0x80000
 #endif
 #define BOOTLOADER_BASE   0x80000
+#define CORE_RELEASE      0x40000
 
 #define MEMORY_TOP        0xFE000000
 #define MEMORY_BOTTOM     2 * SECTION_SIZE
