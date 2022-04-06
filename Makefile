@@ -116,8 +116,14 @@ debug:
 run-debug-target: 
 	sudo openocd -f ./tools/adafruit.cfg  -f ./tools/raspi4.cfg 
 
-debug-target-kernel:
+debug-target-kernel0:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(KERNEL_NAME).elf
+
+debug-target-kernel1:
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3334' ./build/$(KERNEL_NAME).elf
+
+debug-target-kernel2:
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3335' ./build/$(KERNEL_NAME).elf
 
 debug-target-bootloader:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3334' ./build/$(BOOTLOADER_NAME).elf

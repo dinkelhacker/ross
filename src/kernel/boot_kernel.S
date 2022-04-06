@@ -21,12 +21,22 @@ _start:
 #endif
 	// Check processor ID is zero (executing on main core), else hang
 	// Copy system register `mpidr_el1` into x1
-	mrs   x1, mpidr_el1
+	mrs x1, mpidr_el1
 	// and x1 with 0b11
-	and   x1, x1, #3
-	// If core `0` go to _entry
-	cbz   x1, _entry 
-	
+	and x1, x1, #3
+	cmp x1, #0
+	ldr x5, =__stack_core_0
+	beq _entry_el3_core0
+	cmp x1, #1
+	ldr x5, =__stack_core_1
+	beq _entry_el3
+	cmp x1, #2
+	ldr x5, =__stack_core_2
+	beq _entry_el3
+	cmp x1, #3
+	ldr x5, =__stack_core_3
+	beq _entry_el3
+
 _halt:  
 	// `WaitForEvent` suspend the core until an event occures 
 	wfe
@@ -177,28 +187,42 @@ _conf_spsr_el2:
 	eret 
 
 _kernel_entry_el1:
-	//ldr   x5, = 2 * SECTION_SIZE
-	ldr   x5, = 2 * SECTION_SIZE
+	mrs x1, mpidr_el1
+	and x1, x1, #3
+	cmp x1, #0
+	ldr x5, =__stack_core_0
 	mov   sp, x5
-	b os_entry
+	beq os_entry
+	cmp x1, #1
+	ldr x5, =__stack_core_1
+	mov   sp, x5
+	beq os_idle
+	cmp x1, #2
+	ldr x5, =__stack_core_2
+	mov   sp, x5
+	beq os_idle
+	cmp x1, #3
+	ldr x5, =__stack_core_3
+	mov   sp, x5
+	beq os_idle
 
-_entry: 
-	// Main core
-	// Set stack before our code
-	ldr   x5, =_start
-	mov   sp, x5
-	
+
+_entry_el3_core0:
 	// clear bss
-	ldr   x5, =__bss_start
-	ldr   w6, =__bss_size
+	ldr   x6, =__bss_start
+	ldr   w7, =__bss_size
 1: 
-	cbz   w6, 2f
-	str   xzr, [x5], #8
-	sub   w6, w6, #1
-	cbnz  w6, 1b
+	cbz   w7, 2f
+	str   xzr, [x6], #8
+	sub   w7, w7, #1
+	cbnz  w7, 1b
  
 2:  
+_entry_el3: 
+	// Set stack
+	mov   sp, x5
+
 	// jump to C code, should not return
-	bl    main
+	bl    init
 	// if it returns halt this core too
 	b     _halt

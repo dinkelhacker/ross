@@ -3,42 +3,48 @@ ENTRY(_start)
  
 SECTIONS
 {
-    /* Starts at KERNEL_BASE. */
-    . = KERNEL_BASE;
-    __start = .;
-    __text_start = .;
-    .text :
-    {
-        KEEP(*(.text.boot))
-        *(.text)
-    }
-    . = ALIGN(4096); /* align to page size */
-    __text_end = .;
- 
-    __rodata_start = .;
-    .rodata :
-    {
-        *(.rodata)
-    }
-    . = ALIGN(4096); /* align to page size */
-    __rodata_end = .;
- 
-    __data_start = .;
-    .data :
-    {
-        *(.data)
-    }
-    . = ALIGN(4096); /* align to page size */
-    __data_end = .;
- 
-    __bss_start = .;
-    .bss :
-    {
-        bss = .;
-        *(.bss)
-    }
-    . = ALIGN(4096); /* align to page size */
-    __bss_end = .;
-    __bss_size = __bss_end - __bss_start;
-    __end = .;
+	/* Stacks for init tasks */
+	__stack_core_0 = KERNEL_STACK_CORE0;
+	__stack_core_1 = KERNEL_STACK_CORE1;
+	__stack_core_2 = KERNEL_STACK_CORE2;
+	__stack_core_3 = KERNEL_STACK_CORE3;
+	
+	/* Starts at KERNEL_BASE. */
+	. = KERNEL_BASE;
+	__start = .;
+	__text_start = .;
+	.text :
+	{
+	    KEEP(*(.text.boot))
+	    *(.text)
+	}
+	. = ALIGN(4096); /* align to page size */
+	__text_end = .;
+	
+	__rodata_start = .;
+	.rodata :
+	{
+	    *(.rodata)
+	}
+	. = ALIGN(4096); /* align to page size */
+	__rodata_end = .;
+	
+	__data_start = .;
+	.data :
+	{
+	    *(.data)
+	}
+	. = ALIGN(4096); /* align to page size */
+	__data_end = .;
+	
+	__bss_start = .;
+	.bss :
+	{
+	    bss = .;
+	    *(.bss)
+	}
+	. = ALIGN(4096); /* align to page size */
+	__bss_end = .;
+	__bss_size = __bss_end - __bss_start;
+	__end = .;
 }

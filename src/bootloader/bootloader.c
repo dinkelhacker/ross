@@ -4,6 +4,8 @@
 #include "io.h"
 #include "kernel_loader.h"
 #include "memory_layout.h"
+#include "asm_utils.h"
+#include "utils.h"
  
 void bootloader_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 {
@@ -26,7 +28,13 @@ void bootloader_main(uint64_t dtb_ptr32, uint64_t x1, uint64_t x2, uint64_t x3)
 
 void waiting_core()
 {
-	volatile uint32_t *p =  CORE_RELEASE;
-	while(*p != 0xabcdef){};
+	uint32_t core = get_core_id() - 1;
+	cpu_boot_status *status = BOOT_CORE_STATUS;
+	while((status + core)->core_released != CORE_RELEASED)
+	{
+		__asm__("wfe");
+	};
 	uart_writeText("Released!");
+	print_core_id();
+	jumpToAddr((status + core)->addr);
 }

@@ -4,7 +4,7 @@ import time
 
 image = "./build/kernel.img"
 
-serial = serial.Serial("/dev/ttyUSB0",115200)
+serial = serial.Serial("/dev/ttyUSB1",115200)
 time.sleep(1)
 
 print("sending request...")

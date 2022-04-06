@@ -7,10 +7,10 @@ OBJCPY  = ./gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-ob
 ASM = ./gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc
 
 
-CC8?=../../build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-gcc
-LD8?=../../build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-ld
-OBJCOPY8?=../../build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-objcopy
-OBJDUMP8?=../../build/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin/aarch64-none-elf-objdump -maarch64
+CC8?=../../build/gcc-arm/bin/aarch64-none-elf-gcc
+LD8?=../../build/gcc-arm/bin/aarch64-none-elf-ld
+OBJCOPY8?=../../build/gcc-arm/bin/aarch64-none-elf-objcopy
+OBJDUMP8?=../../build/gcc-arm/bin/aarch64-none-elf-objdump -maarch64
 
 CC7?=arm-linux-gnueabihf-gcc -march=armv7-a
 LD7?=arm-linux-gnueabihf-ld

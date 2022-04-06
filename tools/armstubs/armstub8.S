@@ -151,6 +151,8 @@ _start:
 //	eret
 //in_el2:
 
+	b	primary_cpu	
+//dont stop non primary cores
 	mrs x6, MPIDR_EL1
 	and x6, x6, #0x3
 	cbz x6, primary_cpu

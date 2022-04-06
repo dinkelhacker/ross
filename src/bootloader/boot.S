@@ -18,10 +18,7 @@ _start:
 	and     x1, x2, #3
 	// If core `0` go to `_mainCore`
 	cbz     x1, _mainCore
-	
-// Not main cores
-	//wfe
-	//b     idle 
+
 	ldr 	x5, =_stack_core1
 	cmp 	x1, #1
 	beq 	_other_cores
@@ -33,7 +30,9 @@ _start:
 	beq 	_other_cores
 _other_cores:
 	mov   sp, x5
-	b waiting_core
+	wfe
+	bl waiting_core
+	b _halt
 
 
 _mainCore: 
