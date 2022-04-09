@@ -4,7 +4,9 @@
 #include <stdbool.h>
 #include "error.h"
 #include "stdint.h"
+#include "spinlock.h"
 
+static spinlock_t uart_lock;
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK/(baud*8))-1)
 
@@ -70,13 +72,16 @@ void uart_writeByteBlocking(unsigned char ch)
 	mmio_write(AUX_MU_IO_REG, (uint32_t)ch);
 }
 
+
 void uart_writeText(char *buffer)
 {
+	//spin_lock(&uart_lock);
 	while (*buffer) {
 		 if (*buffer == '\n') 
 			 uart_writeByteBlocking('\r');
 		 uart_writeByteBlocking(*buffer++);
 	}
+	//spin_unlock(&uart_lock);
 }
 
 unsigned char uart_readByteBlocking()

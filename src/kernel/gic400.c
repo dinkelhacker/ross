@@ -32,6 +32,8 @@ int gic400_init(void *interrupt_controller_base)
 	gicd_enableir(97);
 	gicd_groupir(97,1);
 	gicd_irtarget(97, 0);
+	gicd_irtarget(97, 1);
+	gicd_irtarget(97, 2);
 
 	gicd_enableir(IRID_GPIO_BANK0);
 	gicd_groupir(IRID_GPIO_BANK0, 1);
@@ -40,11 +42,15 @@ int gic400_init(void *interrupt_controller_base)
 	gic400.gicd->icfg[6] = 0x00000000;
 
 	gicd_ctrl(GIC400_ENABLE_GRP1);
-	gic400.gicc->pm = 0xFF;
-	gicc_ctrl(GIC400_ENABLE_GRP1);
 
 
 	return error;
+}
+
+int gic400_enable_cpuif()
+{
+	gic400.gicc->pm = 0xFF;
+	return gicc_ctrl(GIC400_ENABLE_GRP1);
 }
 
 //void gicd_icfg(uint32_t irid, uint32_t mode){

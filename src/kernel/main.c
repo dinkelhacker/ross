@@ -16,6 +16,7 @@
 #include "memory_layout.h"
 #include "mm.h"
 
+static cpu_boot_status *cores = BOOT_CORE_STATUS;
 
 void os_idle(void);
 
@@ -33,9 +34,12 @@ void init(
 	volatile uint32_t exceptionLevel = getExceptionLevel();
 	init_vector_table();
 
-	// init the interrupt controller only once from core 0
-	if(0 == get_core_id())
+	// init the gic distributor only once from core 0
+	if(0 == get_core_id()) {
 		gic400_init((void *) 0xFF840000UL);
+		gic400_enable_cpuif();
+	} else
+		gic400_enable_cpuif();
 	
 	// configure Processor
 	_conf_sctlr_el1();
@@ -53,7 +57,6 @@ void init(
 }
 
 
-static cpu_boot_status *cores = BOOT_CORE_STATUS;
 void os_entry()
 {
 	/* Init peripherals, system timer and enable IRQs */
@@ -71,14 +74,13 @@ void os_entry()
 	print_core_id();
 
 	/* Fork some kernel tasks. */
-	(void) fork((unsigned long) &process, (unsigned long) "Task 1\n");
-	(void) fork((unsigned long) &process, (unsigned long) "Task 2\n");
+	(void) fork((unsigned long) &process, (unsigned long) "Task 1\n", 0);
+	(void) fork((unsigned long) &process, (unsigned long) "Task 2\n", 1);
+	(void) fork((unsigned long) &process, (unsigned long) "Task 3\n", 2);
 	/* User space task. */
-	(void) fork((unsigned long) &transition_process,(unsigned long) &suspended);
+	(void) fork((unsigned long) &transition_process,(unsigned long) &suspended, 0);
 
 	/* Release other cores */
-	volatile int stop = 1;
-	while (stop) {};
 	memzero(cores, 3 * sizeof(cpu_boot_status));
 	cores->addr = 0x160000;
 	cores->core_released = CORE_RELEASED;
@@ -92,6 +94,11 @@ void os_entry()
 	/* Go to the os idle loop. */
 
 	timer_init();
+	os_idle();
+}
+
+void os_entry_secondary() {
+	enable_irq();
 	os_idle();
 }
 

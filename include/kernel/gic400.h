@@ -73,6 +73,7 @@ typedef struct {
 } gic400_gicc_t;
 
 extern int gic400_init(void* interrupt_controller_base);
+extern int gic400_enable_cpuif();
 extern uint32_t gicc_apirq();
 extern void gicc_eoi(uint32_t irid);
 #endif

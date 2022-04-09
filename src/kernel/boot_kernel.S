@@ -196,15 +196,15 @@ _kernel_entry_el1:
 	cmp x1, #1
 	ldr x5, =__stack_core_1
 	mov   sp, x5
-	beq os_idle
+	beq os_entry_secondary
 	cmp x1, #2
 	ldr x5, =__stack_core_2
 	mov   sp, x5
-	beq os_idle
+	beq os_entry_secondary
 	cmp x1, #3
 	ldr x5, =__stack_core_3
 	mov   sp, x5
-	beq os_idle
+	beq os_entry_secondary
 
 
 _entry_el3_core0:

@@ -46,9 +46,9 @@ typedef struct processor_state {
 #define TASK_RUNNING 1
 
 
-extern struct task_struct *current;
-extern struct task_struct * task[5];
-extern int nr_tasks;
+extern struct task_struct *current[4];
+extern struct task_struct * task[4][5];
+extern int nr_tasks[4];
 
 extern void
 process(char* string);
@@ -62,6 +62,6 @@ suspended(void);
 extern void 
 reset_device(void);
 
-extern int fork(unsigned long fn_addr, unsigned long args);
+extern int fork(unsigned long fn_addr, unsigned long args, uint32_t target_core);
 #endif
 #endif

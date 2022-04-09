@@ -8,19 +8,27 @@
 #include "utils.h"
 #include <stdint.h>
 #include "mm.h"
+#include "asm_utils.h"
 #include "peripherals.h"
 
 #include "exceptions.h"
 static volatile uint32_t reset = 0;
-static struct task_struct init_task =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
+static struct task_struct init_task0 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
+static struct task_struct init_task1 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
+static struct task_struct init_task2 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
+static struct task_struct init_task3 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 #define EL0t 0x00000000
 
-struct task_struct *current = &(init_task);
-struct task_struct * task[5]= {&(init_task), };
-int nr_tasks = 1;
+struct task_struct *current[4] = {&(init_task0), &(init_task1), &(init_task2), &(init_task3)};
+struct task_struct * task[4][5]= {
+	{&(init_task0), }, 
+	{&(init_task1), }, 
+	{&(init_task2), }, 
+	{&(init_task3), }, 
+};
+int nr_tasks[4] = {1,1,1,1};
 
-void
-process(char *string)
+void process(char *string)
 {
 	uint32_t i = 0;
 
@@ -39,8 +47,7 @@ process(char *string)
 }
 
 
-void
-reset_device(void)
+void reset_device(void)
 {
 	while(1) {
 		if(reset){
@@ -52,10 +59,10 @@ reset_device(void)
 	}
 }
 
-void 
-transition_process(unsigned long fn)
+void transition_process(unsigned long fn)
 {
-	processor_state *state =(processor_state *) (current + PAGE_SIZE - sizeof(processor_state)); // get_pt_processor_state(current);
+	uint32_t thiscore = get_core_id();
+	processor_state *state =(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state)); // get_pt_processor_state(current);
 	memzero((unsigned long) state, sizeof(*state));
 	state->pc = fn;
 	state->pstate = EL0t; 
@@ -65,8 +72,7 @@ transition_process(unsigned long fn)
 }
 
 
-void
-suspended(void)
+void suspended(void)
 {
 
 
