@@ -33,14 +33,14 @@ void process(char *string)
 	uint32_t i = 0;
 
 	while(1) {
-		uart_writeText(string);
+		uart_print(string);
 		print_current_el();
 
 		for (uint32_t j=0; j<i; j++) {
-			uart_writeText("X");
+			uart_print("X");
 		}
 
-		uart_writeText("\n");
+		uart_print("\n");
 		i++;
 		delay(1000000);
 	}
@@ -51,8 +51,8 @@ void reset_device(void)
 {
 	while(1) {
 		if(reset){
-			mmio_write(PM_WDOG, PM_PASSWORD | 1);
-			mmio_write(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
+			mmio_write32(PM_WDOG, PM_PASSWORD | 1);
+			mmio_write32(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
 		}
 
 		delay(1000000);
@@ -62,7 +62,8 @@ void reset_device(void)
 void transition_process(unsigned long fn)
 {
 	uint32_t thiscore = get_core_id();
-	processor_state *state =(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state)); // get_pt_processor_state(current);
+	processor_state *state =
+		(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state));
 	memzero((unsigned long) state, sizeof(*state));
 	state->pc = fn;
 	state->pstate = EL0t; 
@@ -74,16 +75,13 @@ void transition_process(unsigned long fn)
 
 void suspended(void)
 {
-
-
-	uart_writeText("Suspended 1\n");
+	uart_print("Suspended 1\n");
 	syscall(SYSC_TASK_SUSPEND);
-	uart_writeText("Suspended 2\n");
+	uart_print("Suspended 2\n");
 	syscall(SYSC_TASK_SUSPEND);
-	uart_writeText("Suspended 3\n");
+	uart_print("Suspended 3\n");
 
 	while(1) {
-		//syscall(SYSC_TASK_SUSPEND);
 		delay(1000000);
 	}
 }

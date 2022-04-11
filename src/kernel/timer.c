@@ -12,8 +12,8 @@ void timer_init(void)
 	cur += 2 * 5000000;
 	
 
-	mmio_write(SYS_TIMER_C1, cur);
-	mmio_write(SYS_TIMER_CS, 0x1 << 1);
+	mmio_write32(SYS_TIMER_C1, cur);
+	mmio_write32(SYS_TIMER_CS, 0x1 << 1);
 }
 
 

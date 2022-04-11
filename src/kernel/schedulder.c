@@ -12,7 +12,7 @@ extern void cpu_switch_to(struct task_struct* prev, struct task_struct* next);
 void scheduler()
 {
 	uint32_t thiscore = get_core_id();
-	uart_writeText("scheduler\n");
+	uart_print("scheduler\n");
 	switch_to(task[thiscore][(current[thiscore]->pid + 1) % nr_tasks[thiscore]]);
 }
 

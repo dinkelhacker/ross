@@ -34,7 +34,7 @@ void handle_syscall(uint32_t exception_type, uint32_t sysid)
 	switch (sysid){
 	case SYSC_TASK_SUSPEND:
 		enable_irq();
-		uart_writeText("Syscall\n");
+		uart_print("Syscall\n");
 		scheduler();
 		disable_irq();
 	}
@@ -70,7 +70,7 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 	if(esr == 0) {
 		switch (irid) {
 		case IRID_SYSTIMER:
-			uart_writeText("Timer Interrupt\n");
+			uart_print("Timer Interrupt\n");
 			/* Reset the timer */
 			timer_init();
 			/* Clear the interrupt otherwise it won't be fired again.*/
@@ -87,15 +87,15 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 			/* Clear the gpio event register, or it will be fired again.*/
 			gpio_clear_event(16);
 			/* Let the (Watch)Dog out ;)! */
-			mmio_write(PM_WDOG, PM_PASSWORD | 1);
-			mmio_write(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
+			mmio_write32(PM_WDOG, PM_PASSWORD | 1);
+			mmio_write32(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
 		break;
 		default:
-			uart_writeText("Unknown Interrupt\n");
+			uart_print("Unknown Interrupt\n");
 		}
 	} else {
 		/* O.o Unexpected! */
-		uart_writeText("Unknown Interrupt\n");
+		uart_print("Unknown Interrupt\n");
 		while(1); 
 	}
 }

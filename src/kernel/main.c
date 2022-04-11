@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "gpio.h"
 #include "io.h"
+#include "asm.h"
 #include "asm_utils.h"
 #include "exceptions.h"
 #include "scheduler.h"
@@ -31,7 +32,7 @@ void init(
 	(void) x2;
 	(void) x3;
 	
-	volatile uint32_t exceptionLevel = getExceptionLevel();
+	volatile uint32_t exceptionLevel = get_el();
 	init_vector_table();
 
 	// init the gic distributor only once from core 0
@@ -59,6 +60,7 @@ void init(
 
 void os_entry()
 {
+
 	/* Init peripherals, system timer and enable IRQs */
 	uart_init();
 	
@@ -68,8 +70,7 @@ void os_entry()
 	(void) gpio_high_level_detect(16,1);
 
 	enable_irq();
-
-	uart_writeText("Kernel running! \n");
+	uart_print("Kernel running! \n");
 	print_current_el();
 	print_core_id();
 
@@ -82,15 +83,11 @@ void os_entry()
 
 	/* Release other cores */
 	memzero(cores, 3 * sizeof(cpu_boot_status));
-	cores->addr = 0x160000;
-	cores->core_released = CORE_RELEASED;
-	wakeup_cores();
-	uart_writeText("Kernel running! \n");
+	setup_core(cores, 0x160000, CORE_RELEASED);
+	setup_core(cores + 1, 0x160000, CORE_RELEASED);
+	setup_core(cores + 2, 0x160000, CORE_RELEASED);
 	delay(1000000);
-	(cores + 1)->addr = 0x160000;
-	(cores + 1)->core_released = CORE_RELEASED;
 	wakeup_cores();
-	delay(1000000);
 	/* Go to the os idle loop. */
 
 	timer_init();
@@ -105,7 +102,7 @@ void os_entry_secondary() {
 void os_idle()
 {
 	while(1) {
-		uart_writeText("OS Idle\n");
+		uart_print("OS Idle\n");
 		delay(1000000);
 	}
 }

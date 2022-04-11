@@ -43,3 +43,25 @@ cpu_switch_to:
 	ldr	x30, [x8]
 	mov	sp, x9
 	ret
+
+
+
+.globl wakeup_cores
+wakeup_cores:
+	sev
+	ret
+
+.globl memzero
+memzero:
+	str 	xzr, [x0], #8
+	subs 	x1, x1, #8
+	b.gt 	memzero
+	ret
+
+.globl setup_core
+/* void setup_core(cpu_boot_status *core, uint32_t addr) */
+setup_core:
+	str	w1, [x0, 4]
+	dmb	ishst
+	str	w2, [x0]
+	ret

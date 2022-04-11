@@ -30,7 +30,6 @@ _start:
 	beq 	_other_cores
 _other_cores:
 	mov   sp, x5
-	wfe
 	bl waiting_core
 	b _halt
 
@@ -55,3 +54,16 @@ _mainCore:
 	b _halt
 _halt:
 	b _halt
+
+.globl wait_for_release
+/* void wait_for_release(cpu_boot_status *core, uint32_t released_flag) */
+wait_for_release:
+	mov 	x2, x0
+1:
+	wfe
+	ldr	w0, [x2]
+	cmp	w0, w1
+	b.ne	1b
+	dmb	ishld
+	ldr	w0, [x2,4]
+	b 	jump_to
