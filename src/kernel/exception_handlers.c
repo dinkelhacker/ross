@@ -63,7 +63,6 @@ void handle_sync(uint32_t type, unsigned long esr, unsigned long address)
 void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 {
 	(void) type;
-	(void) esr;
 	(void) address;
 
 	uint32_t irid = gicc_apirq();

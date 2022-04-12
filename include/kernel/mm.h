@@ -3,7 +3,7 @@
 
 extern unsigned long get_free_page();
 extern void free_page(unsigned long p);
-extern void memzero(unsigned long src, unsigned long n);
+extern void memzero(void* src, unsigned long n);
 
 #endif
 

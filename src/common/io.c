@@ -10,17 +10,6 @@ static spinlock_t uart_lock;
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK/(baud*8))-1)
 
-// Basic mmio read/write
-void mmio_write32(uint64_t reg, uint32_t val)
-{
-	*(volatile uint32_t *) reg = val;
-}
-
-uint32_t mmio_read(uint64_t reg)
-{
-	return *(volatile uint32_t *) reg;
-}
-
 void uart_init()
 {
 	mmio_write32(AUX_ENABLES, 1); //enable UART1
@@ -40,18 +29,18 @@ void uart_init()
 
 uint32_t uart_isWriteByteReady()
 {
-	return mmio_read(AUX_MU_LSR_REG) & 0x20;
+	return mmio_read32(AUX_MU_LSR_REG) & 0x20;
 }
 
-uint32_t uart_isReadByteReady(){
-	return mmio_read(AUX_MU_LSR_REG) & 0x01;
+uint32_t uart_is_read_rdy(){
+	return mmio_read32(AUX_MU_LSR_REG) & 0x01;
 }
 
-uint32_t uart_readIntBlocking()
+uint32_t uart_read_u32()
 {
 	uint32_t num;
 	for (int i=0; i<4;i++) {
-		char c = uart_readByteBlocking();
+		char c = uart_read_byte_blocking();
 		num = num << 8;
 		num += (uint32_t) c;
 	}
@@ -84,17 +73,17 @@ void uart_print(char *buffer)
 	//spin_unlock(&uart_lock);
 }
 
-unsigned char uart_readByteBlocking()
+unsigned char uart_read_byte_blocking()
 {
-	while (!uart_isReadByteReady());
-	return (unsigned char)mmio_read(AUX_MU_IO_REG);
+	while (!uart_is_read_rdy());
+	return (unsigned char)mmio_read32(AUX_MU_IO_REG);
 }
 
 
-int uart_readByte(char* byte)
+int uart_read_byte(char* byte)
 {
-	if (uart_isReadByteReady()) {
-		*byte = (unsigned char)mmio_read(AUX_MU_IO_REG);
+	if (uart_is_read_rdy()) {
+		*byte = (unsigned char)mmio_read32(AUX_MU_IO_REG);
 		return OK;
 	} else {
 		return ERROR;
@@ -105,7 +94,7 @@ bool readString(char *buff)
 {
 	unsigned char c;
 	while(*buff) {
-		c = uart_readByteBlocking();
+		c = uart_read_byte_blocking();
 		if (c != *buff) return false;
 		buff++;
 	}

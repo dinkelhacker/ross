@@ -17,7 +17,6 @@
 #include "memory_layout.h"
 #include "mm.h"
 
-static cpu_boot_status *cores = BOOT_CORE_STATUS;
 
 void os_idle(void);
 
@@ -60,16 +59,15 @@ void init(
 
 void os_entry()
 {
-
 	/* Init peripherals, system timer and enable IRQs */
 	uart_init();
+	enable_irq();
 	
 	/* Generate interrupt if pin 16 is `high` (for "reset pin"). */
 	(void) gpio_set_pull(16, GPIO_P_DOWN);
 	(void) gpio_function_select(16, GPIO_F_IN);
 	(void) gpio_high_level_detect(16,1);
 
-	enable_irq();
 	uart_print("Kernel running! \n");
 	print_current_el();
 	print_core_id();
@@ -82,11 +80,11 @@ void os_entry()
 	(void) fork((unsigned long) &transition_process,(unsigned long) &suspended, 0);
 
 	/* Release other cores */
-	memzero(cores, 3 * sizeof(cpu_boot_status));
-	setup_core(cores, 0x160000, CORE_RELEASED);
-	setup_core(cores + 1, 0x160000, CORE_RELEASED);
-	setup_core(cores + 2, 0x160000, CORE_RELEASED);
-	delay(1000000);
+	volatile cpu_boot_status *cores = (cpu_boot_status *) BOOT_CORE_STATUS;
+	memzero((void *) cores, 3 * sizeof(cpu_boot_status));
+	setup_core(&cores[0], 0x160000, CORE_RELEASED);
+	setup_core(&cores[1], 0x160000, CORE_RELEASED);
+	setup_core(&cores[2], 0x160000, CORE_RELEASED);
 	wakeup_cores();
 	/* Go to the os idle loop. */
 

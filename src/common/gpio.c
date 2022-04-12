@@ -11,7 +11,7 @@ void set_bfield_in_reg(
 	uint32_t value, uint32_t shift)
 {
 	uint32_t field_mask = (1 << field_size) - 1;
-	uint32_t regval = mmio_read(reg);
+	uint32_t regval = mmio_read32(reg);
 	regval &= ~((uint32_t) field_mask << shift);
 	regval |= ((uint32_t) value << shift);
 	mmio_write32(reg, regval);
@@ -53,7 +53,7 @@ int gpio_get_lvl(uint8_t pin)
 {
 	if(pin > 57)
 		return ERROR;
-	return 0x00000001u & (mmio_read((uint64_t) &gpio->gplev[pin/32]) >> (pin % 32));
+	return 0x00000001u & (mmio_read32((uint64_t) &gpio->gplev[pin/32]) >> (pin % 32));
 }
 
 int gpio_clear_event(uint8_t pin)

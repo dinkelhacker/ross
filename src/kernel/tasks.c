@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include "io.h"
 #include "syscall.h"
 #include "memory_layout.h"
@@ -10,9 +9,8 @@
 #include "mm.h"
 #include "asm_utils.h"
 #include "peripherals.h"
-
 #include "exceptions.h"
-static volatile uint32_t reset = 0;
+
 static struct task_struct init_task0 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 static struct task_struct init_task1 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 static struct task_struct init_task2 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
@@ -46,32 +44,18 @@ void process(char *string)
 	}
 }
 
-
-void reset_device(void)
-{
-	while(1) {
-		if(reset){
-			mmio_write32(PM_WDOG, PM_PASSWORD | 1);
-			mmio_write32(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
-		}
-
-		delay(1000000);
-	}
-}
-
 void transition_process(unsigned long fn)
 {
 	uint32_t thiscore = get_core_id();
 	processor_state *state =
 		(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state));
-	memzero((unsigned long) state, sizeof(*state));
+	memzero((void*) state, sizeof(*state));
 	state->pc = fn;
 	state->pstate = EL0t; 
 	unsigned long userspace_stack = get_free_page();
 	//TODO: Error check
 	state->sp = userspace_stack + PAGE_SIZE;
 }
-
 
 void suspended(void)
 {
