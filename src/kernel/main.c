@@ -56,10 +56,13 @@ void init(
 	}
 }
 
-
+extern void mmu_init(void);
 void os_entry()
 {
 	/* Init peripherals, system timer and enable IRQs */
+	//volatile int stop = 1;
+	//while(stop) {};
+	mmu_init();
 	uart_init();
 	enable_irq();
 	
@@ -77,7 +80,7 @@ void os_entry()
 	(void) fork((unsigned long) &process, (unsigned long) "Task 2\n", 1);
 	(void) fork((unsigned long) &process, (unsigned long) "Task 3\n", 2);
 	/* User space task. */
-	(void) fork((unsigned long) &transition_process,(unsigned long) &suspended, 0);
+	//(void) fork((unsigned long) &transition_process,(unsigned long) &suspended, 0);
 
 	/* Release other cores */
 	volatile cpu_boot_status *cores = (cpu_boot_status *) BOOT_CORE_STATUS;

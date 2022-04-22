@@ -46,5 +46,11 @@ SECTIONS
 	. = ALIGN(4096); /* align to page size */
 	__bss_end = .;
 	__bss_size = __bss_end - __bss_start;
+//	.locks 0x40000000 :
+//	{
+//		*(.bss)
+//		*(.data)
+//	}
+//	. = ALIGN(4096); /* align to page size */
 	__end = .;
 }

@@ -6,6 +6,7 @@
 #include "stdint.h"
 #include "spinlock.h"
 
+// __attribute__((section (".locks")))
 static spinlock_t uart_lock;
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK/(baud*8))-1)
@@ -64,13 +65,13 @@ void uart_writeByteBlocking(unsigned char ch)
 
 void uart_print(char *buffer)
 {
-	//spin_lock(&uart_lock);
+	spin_lock(&uart_lock);
 	while (*buffer) {
 		 if (*buffer == '\n') 
 			 uart_writeByteBlocking('\r');
 		 uart_writeByteBlocking(*buffer++);
 	}
-	//spin_unlock(&uart_lock);
+	spin_unlock(&uart_lock);
 }
 
 unsigned char uart_read_byte_blocking()
