@@ -30,6 +30,7 @@ if(resp == b'Ok\r\n'):
     binary = img_file.read()
     serial.write(binary)
     img_file.close()
+    print("sending done")
 
 while 1:
     print(serial.readline().decode('utf-8'))
