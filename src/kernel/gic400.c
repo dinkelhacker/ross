@@ -34,6 +34,7 @@ int gic400_init(void *interrupt_controller_base)
 	gicd_irtarget(97, 0);
 	gicd_irtarget(97, 1);
 	gicd_irtarget(97, 2);
+	gicd_irtarget(97, 3);
 
 	gicd_enableir(IRID_GPIO_BANK0);
 	gicd_groupir(IRID_GPIO_BANK0, 1);

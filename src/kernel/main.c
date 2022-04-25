@@ -97,6 +97,7 @@ void os_entry()
 
 void os_entry_secondary() {
 	enable_irq();
+	mmu_init();
 	os_idle();
 }
 

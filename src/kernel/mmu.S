@@ -33,7 +33,11 @@ mmu_init:
 	                           // TBI0=0b0   Top byte not ignored
 	                           // TG0=0b00   4KB granule
 	                           // IPS=0     32-bit PA space
+
 	msr   tcr_el1, x0
+	MRS     x2, tcr_el1                  // verify CPU supports desired config
+	CMP     x2, x0
+	B.NE    .
 
 	// Invalidate TLBs
 	// ----------------
@@ -76,11 +80,17 @@ mmu_init:
 	// L2 Table
 	ldr	x1, =tt_l2_base              // Address of L2 table
 
-	ldr	x0, =TT_S1_NORMAL_WBWA
-	orr	x0, x0, #TT_S1_INNER_SHARED  // ‘OR' with inner-shareable attribute
-	                                   // AP=0, RW
-	orr	x0, x0, xzr          // 'OR' template with base physical address
+	// [0]: 0x0000,0000 - 0x01ff,fff	// 2mb
+	ldr	x2, =tt_l3_base
+	ldr	x0, =TT_S1_TABLE		// Entry template for pointer to next table
+	orr	x0, x0, x2
 	str	x0, [x1]
+
+	//ldr	x0, =TT_S1_NORMAL_WBWA
+	//orr	x0, x0, #TT_S1_INNER_SHARED  // ‘OR' with inner-shareable attribute
+	//                                   // AP=0, RW
+	//orr	x0, x0, xzr          // 'OR' template with base physical address
+	//str	x0, [x1]
 
 	ldr	x0, =TT_S1_NORMAL_WBWA
 	orr	x0, x0, #TT_S1_INNER_SHARED  // ‘OR' with inner-shareable attribute
@@ -94,45 +104,56 @@ mmu_init:
 	orr	x0, x0, #0x400000          // 'OR' template with base physical address
 	str	x0, [x1, #16]
 
-	// [0]: 0x0000,0000 - 0x01ff,fff	// 2mb
-	//ldr	x2, =tt_l3_base
-	//ldr	x0, =TT_S1_TABLE		// Entry template for pointer to next table
-	//orr	x0, x0, x2
-	//str	x0, [x1], #8
 
-	// ... don't need more than 2mb right now
+
+	// ... don't need more than 6mb right now
 
 	// L3 Table
 	ldr	x1, =tt_l3_base              // Address of L2 table
 
 	// [0..39]: 0x0000,0000 - 0x0003,FFFF 
+//	ldr	x0, =TT_S1_NORMAL_WBWA       // Entry template
+//	orr	x0, x0, #TT_S1_INNER_SHARED  // 'OR' with inner-shareable attribute
+//	orr	x0, x0, #2
+//	orr	x0, x0, xzr                  // 'OR' template with base physical address
+//	mov	x2, #512
+//	1:
+//	str	x0, [x1], #8
+//	add	x0, x0, #0x1000            // Increment the physical address field
+//	sub	x2, x2, #1
+//	cbnz	x2, 1b
+	 
+	// [0..63]: 0x0000,0000 - 0x0003,FFFF 
 	ldr	x0, =TT_S1_NORMAL_WBWA       // Entry template
 	orr	x0, x0, #TT_S1_INNER_SHARED  // 'OR' with inner-shareable attribute
+	orr	x0, x0, #3			// is not a contiguous block
 	orr	x0, x0, xzr                  // 'OR' template with base physical address
-	mov	x2, #40
+	mov	x2, #64
 	1:
 	str	x0, [x1], #8
 	add	x0, x0, #0x1000            // Increment the physical address field
 	sub	x2, x2, #1
 	cbnz	x2, 1b
 	 
-	// [40 - 49] 0x0004,0000 - 0x0004,ffff 
+	// [63 - 79] 0x0004,0000 - 0x0004,ffff 
 	ldr	x0, =TT_S1_NORMAL_NO_CACHE // Entry template
 	orr	x0, x0, #TT_S1_INNER_SHARED  // 'OR' with inner-shareable attribute
+	orr	x0, x0, #3			// is not a contiguous block
 	orr	x0, x0, #0x40000 // 'OR' template with base physical address
-	mov	x2, #10
+	mov	x2, #16
 	1:
 	str	x0, [x1], #8
 	add	x0, x0, #0x1000            // Increment the physical address field
 	sub	x2, x2, #1
 	cbnz	x2, 1b
 
-	// [50..511]: 0x0005,0000 - 0x01ff,ffff
+	// [80..511]: 0x0005,0000 - 0x01ff,ffff
 	ldr	x0, =TT_S1_NORMAL_WBWA       // Entry template
 	orr	x0, x0, #TT_S1_INNER_SHARED  // 'OR' with inner-shareable attribute
+	orr	x0, x0, #3			// is not a contiguous block
 	ldr	w10, =0x50000
 	orr	x0, x0, x10
-	mov	x2, #462
+	mov	x2, #432
 	1:
 	str      x0, [x1], #8
 	add      x0, x0, #0x1000            // Increment the physical address field
@@ -141,7 +162,7 @@ mmu_init:
 
 
 	dsb	sy
-	
+
 	// enable mmu
 	mov 	x0, #(1 << 0)                     // M=1           Enable the stage 1 MMU
 	orr	x0, x0, #(1 << 2)                 // C=1           Enable data and unified caches
