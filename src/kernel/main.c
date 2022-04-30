@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "memory_layout.h"
 #include "mm.h"
+#include "irids.h"
 
 
 void os_idle(void);
@@ -34,18 +35,21 @@ void init(
 	volatile uint32_t exceptionLevel = get_el();
 	init_vector_table();
 
-	// init the gic distributor only once from core 0
+	/* Init the gic distributor only once from core 0 */
 	if(0 == get_core_id()) {
 		gic400_init((void *) 0xFF840000UL);
-		gic400_enable_cpuif();
-	} else
-		gic400_enable_cpuif();
+	} else {
+		/* Enable SGI Timer on other cores (register is banked) */
+		gicd_enableir(IRID_TIMER_SGI);
+		gicd_groupir(IRID_TIMER_SGI, 1);
+	}
+	gic400_enable_cpuif();
 	
-	// configure Processor
+	/* Configure processor */
 	_conf_sctlr_el1();
 	_conf_hcr_el2();
 
-	// if running at EL3 configure secure configuration register
+	/* if running at EL3 configure secure configuration register */
 	if (exceptionLevel == 3) {
 		_conf_scr_el3();
 		_conf_spsr_el3();
@@ -60,8 +64,6 @@ extern void mmu_init(void);
 void os_entry()
 {
 	/* Init peripherals, system timer and enable IRQs */
-	//volatile int stop = 1;
-	//while(stop) {};
 	mmu_init();
 	uart_init();
 	enable_irq();

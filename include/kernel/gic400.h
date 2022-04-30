@@ -38,9 +38,9 @@ typedef struct {
 	volatile uint32_t icactive[((0x400 - 0x380) / (sizeof(uint32_t)))];
 	volatile uint32_t ipriority[((0x800 - 0x400) / (sizeof(uint32_t)))];
 	volatile uint32_t istargets[((0xC00 - 0x800) / (sizeof(uint32_t)))];
-	volatile uint32_t icfg[((0xD00 - 0xC08) / (sizeof(uint32_t)))];
-	volatile const uint32_t ppis;
-	volatile uint32_t spis[((0xF00 - 0xD04) / (sizeof(uint32_t)))];
+	volatile uint32_t icfg[((0xD00 - 0xC00) / (sizeof(uint32_t)))];
+	volatile uint32_t _impldefined[(0xE00 - 0xD00) / sizeof(uint32_t)];
+	volatile uint32_t nsacr[((0xF00 - 0xE00) / (sizeof(uint32_t)))];
 	volatile uint32_t sgi;
 	volatile uint32_t _res1[((0xF10 - 0xF04) / (sizeof(uint32_t)))];
 	volatile uint32_t cpendsgi[((0xF20 - 0xF10) / (sizeof(uint32_t)))];
@@ -76,5 +76,10 @@ extern int gic400_init(void* interrupt_controller_base);
 extern int gic400_enable_cpuif();
 extern uint32_t gicc_apirq();
 extern void gicc_eoi(uint32_t irid);
+
+extern void gicd_enableir(uint32_t irid);
+extern int gicd_groupir(uint32_t irid, uint32_t group);
+extern int gicd_irtarget(uint32_t irid, uint32_t cpuid);
+void gic400_sched_timer();
 #endif
 

@@ -10,6 +10,9 @@
 #include "asm_utils.h"
 #include "peripherals.h"
 #include "exceptions.h"
+#include "spinlock.h"
+
+static spinlock_t print_lock;
 
 static struct task_struct init_task0 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
 static struct task_struct init_task1 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 };
@@ -31,14 +34,15 @@ void process(char *string)
 	uint32_t i = 0;
 
 	while(1) {
+		spin_lock(&print_lock);
 		uart_print(string);
-		print_current_el();
 
 		for (uint32_t j=0; j<i; j++) {
 			uart_print("X");
 		}
 
 		uart_print("\n");
+		spin_unlock(&print_lock);
 		i++;
 		delay(1000000);
 	}

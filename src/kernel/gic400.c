@@ -17,6 +17,10 @@ int gicd_ctrl(uint32_t mode);
 int gicc_ctrl(uint32_t mode);
 int gic_ctrl(uint32_t mode, uint32_t* ctl);
 
+
+#define ALL_OTHER_CORES (1 << 24)
+#define ONLY_IF_GRP1	(1 << 15)
+
 int gic400_init(void *interrupt_controller_base)
 {
 	int error = OK;
@@ -28,13 +32,9 @@ int gic400_init(void *interrupt_controller_base)
 	gicd_ctrl(GIC400_CTL_DISABLE);
 
 	// enable system timer interrupt (line 1)
-	// strange offset o.O
 	gicd_enableir(97);
 	gicd_groupir(97,1);
 	gicd_irtarget(97, 0);
-	gicd_irtarget(97, 1);
-	gicd_irtarget(97, 2);
-	gicd_irtarget(97, 3);
 
 	gicd_enableir(IRID_GPIO_BANK0);
 	gicd_groupir(IRID_GPIO_BANK0, 1);
@@ -48,18 +48,17 @@ int gic400_init(void *interrupt_controller_base)
 	return error;
 }
 
+void gic400_sched_timer()
+{
+	//volatile uint32_t irid = (1<<24) | (1<<15) | (0xf << 16) | 4;
+	gic400.gicd->sgi = ALL_OTHER_CORES | ONLY_IF_GRP1 | IRID_TIMER_SGI;
+}
+
 int gic400_enable_cpuif()
 {
 	gic400.gicc->pm = 0xFF;
 	return gicc_ctrl(GIC400_ENABLE_GRP1);
 }
-
-//void gicd_icfg(uint32_t irid, uint32_t mode){
-//  if(mode > 1)
-//    return ERROR;
-//
-//  gicd400.gicd->icfg[irid/16] = 
-//}
 
 void gicd_enableir(uint32_t irid)
 {
@@ -69,7 +68,7 @@ void gicd_enableir(uint32_t irid)
 int gicd_groupir(uint32_t irid, uint32_t group)
 {
 	if(group>1)
-			return ERROR;
+		return ERROR;
 
 	uint32_t groupv = (group == 1)? 0x1:0x0;
 	gic400.gicd->igroup[irid/32] |= groupv << (irid % 32);
@@ -80,7 +79,7 @@ int gicd_groupir(uint32_t irid, uint32_t group)
 int gicd_irtarget(uint32_t irid, uint32_t cpuid)
 {
 	if(cpuid > 3)
-			return ERROR;
+		return ERROR;
 	
 	gic400.gicd->istargets[irid/4] |= (0x1 << cpuid) << ((irid % 4) * 8);
 
