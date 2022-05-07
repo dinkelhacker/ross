@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "mm.h"
+#include "memory_layout.h"
 
 static uint64_t *lvl1_table;
 static uint64_t *lvl2_table;
@@ -35,27 +36,38 @@ void mmu_setup_tables()
 	lvl1_table = (uint64_t *) get_free_page();
 	lvl2_table = (uint64_t *) get_free_page();
 	lvl3_table = (uint64_t *) get_free_page();
+	
+	memzero((void*) lvl1_table, PAGE_SIZE);
+	memzero((void*) lvl2_table, PAGE_SIZE);
+	memzero((void*) lvl3_table, PAGE_SIZE);
 
 	/* Level 1 table */
+	/* [0]: 0x0000,0000 - 0x3FFF,FFFF */ 
 	lvl1_table[0] = TT_S1_TABLE |
 			(uint64_t) lvl2_table;
-
+	
+	/* [1]: 0x4000,0000 - 0x7FFF,FFFF */
 	lvl1_table[1] = TT_S1_NORMAL_WBWA |
 			TT_S1_INNER_SHARED |
 			(uint64_t) 0x40000000;
 
+	/* [2]: 0x8000,0000 - 0xBFFF,FFFF */
 	lvl1_table[2] = TT_S1_NORMAL_WBWA |
 			TT_S1_INNER_SHARED |
 			(uint64_t) 0x80000000;
 
+	/* [3]: 0xC000,0000 - 0xFFFF,FFFF */
 	lvl1_table[3] = TT_S1_DEVICE_nGnRnE |
 			TT_S1_INNER_SHARED |
 			(uint64_t) 0xC0000000;
 
+
 	/* Level 2 table */
+	/* [0]: 0x0000,0000 - 0x01FF,FFF */
 	lvl2_table[0] = TT_S1_TABLE |
 			(uint64_t) lvl3_table;
-
+	
+	/* ... until 0x3FFF,FFFF */
 	uint64_t addr = 0x200000;
 	for (uint32_t i= 1; i < 512; i++) {
 		
@@ -64,15 +76,18 @@ void mmu_setup_tables()
 				(i * addr);
 	}
 
+
 	/* Level 3 table */
 	addr = 0x1000;
+	/* [0..63]: 0x0000,0000 - 0x0003,FFFF */
 	for (uint32_t i = 0; i < 64; i++) {
 		lvl3_table[i] = TT_S1_NORMAL_WBWA | 
 				TT_S1_INNER_SHARED |
 				TT_S1_PAGE |
 				(i * addr);
 	}
-
+	
+	/* [64 - 79] 0x0004,0000 - 0x0004,FFFF */
 	for (uint32_t i = 64; i < 80; i++) {
 		lvl3_table[i] = TT_S1_NORMAL_NO_CACHE| 
 				TT_S1_INNER_SHARED |
@@ -80,6 +95,7 @@ void mmu_setup_tables()
 				(i * addr);
 	}
 
+	/* [80..511]: 0x0005,0000 - 0x01FF,FFFF */
 	for (uint32_t i = 80; i < 512; i++) {
 		lvl3_table[i] = TT_S1_NORMAL_NO_CACHE| 
 				TT_S1_INNER_SHARED |

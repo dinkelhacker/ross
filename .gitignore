@@ -1,5 +1,6 @@
 /build/gcc*
 /build/*.elf
+/build/*objdump
 /build/*.map
 /build/*.img
 /build/objects*
