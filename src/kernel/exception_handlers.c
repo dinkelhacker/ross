@@ -73,7 +73,7 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 			uart_print("Timer Interrupt\n");
 			/* Reset the timer */
 			timer_init();
-
+			/* fall through */
 		case IRID_TIMER_SGI:
 			/* Clear the interrupt otherwise it won't be fired again.*/
 			gicc_eoi(irid);

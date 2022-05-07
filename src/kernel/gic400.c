@@ -30,22 +30,23 @@ int gic400_init(void *interrupt_controller_base)
 
 	// disable the controller 
 	gicd_ctrl(GIC400_CTL_DISABLE);
-
-	// enable system timer interrupt (line 1)
-	gicd_enableir(97);
-	gicd_groupir(97,1);
-	gicd_irtarget(97, 0);
-
-	gicd_enableir(IRID_GPIO_BANK0);
-	gicd_groupir(IRID_GPIO_BANK0, 1);
-	gicd_irtarget(IRID_GPIO_BANK0, 0);
-
 	gic400.gicd->icfg[6] = 0x00000000;
-
 	gicd_ctrl(GIC400_ENABLE_GRP1);
 
-
 	return error;
+}
+
+void gic400_enir(uint32_t irid, uint32_t group, uint32_t core)
+{
+	gicd_enableir(irid);
+	gicd_groupir(irid, group);
+	gicd_irtarget(irid, core);
+}
+
+void gic400_ensgi(uint32_t irid, uint32_t group)
+{
+	gicd_enableir(irid);
+	gicd_groupir(irid, group);
 }
 
 void gic400_sched_timer()

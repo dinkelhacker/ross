@@ -111,3 +111,12 @@ int gpio_async_falling_edge_detect(uint8_t pin, uint32_t status)
 	set_bfield_in_reg((uint64_t) &gpio->gpafen[pin/32], 1, status, pin % 32);
 	return OK;
 }
+
+int gpio_irtrigger_high(uint8_t pin)
+{
+	int result = 1;
+	result &= gpio_set_pull(pin, GPIO_P_DOWN);
+	result &= gpio_function_select(pin, GPIO_F_IN);
+	result &= gpio_high_level_detect(pin, 0x1);
+	return result;
+}

@@ -24,6 +24,8 @@
 
 #define GIC400_ENABLE_GRP1 (1 << 1)
 
+#define GIC_GROUP1 (uint32_t) 0x1
+
 typedef struct {
 	volatile uint32_t ctl;
 	volatile const uint32_t type;
@@ -77,6 +79,8 @@ extern int gic400_enable_cpuif();
 extern uint32_t gicc_apirq();
 extern void gicc_eoi(uint32_t irid);
 
+extern void gic400_enir(uint32_t irid, uint32_t group, uint32_t core);
+extern void gic400_ensgi(uint32_t irid, uint32_t group);
 extern void gicd_enableir(uint32_t irid);
 extern int gicd_groupir(uint32_t irid, uint32_t group);
 extern int gicd_irtarget(uint32_t irid, uint32_t cpuid);

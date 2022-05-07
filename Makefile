@@ -2,6 +2,7 @@
 CC = ./build/gcc-arm/bin/aarch64-none-elf-gcc
 LD  = ./build/gcc-arm/bin/aarch64-none-elf-ld
 OBJCPY  = ./build/gcc-arm/bin/aarch64-none-elf-objcopy
+OBJDUMP = ./build/gcc-arm/bin/aarch64-none-elf-objdump
 ASM = ./build/gcc-arm/bin/aarch64-none-elf-gcc
 
 CFLAGS = -g3 -mcpu=cortex-a72 -fpic -ffreestanding
@@ -82,6 +83,7 @@ kernel: $(KERNEL_OBJECTS) ./build/linker/kernel_gen.ld
 		echo $(KERNEL_OBJECTS)
 		$(LD) -nostdlib $(KERNEL_OBJECTS) -T ./build/linker/kernel_gen.ld -o ./build/$(KERNEL_NAME).elf -Map=./build/$(KERNEL_NAME).map
 		$(OBJCPY) -O binary ./build/$(KERNEL_NAME).elf ./build/$(KERNEL_NAME).img 
+		$(OBJDUMP) -S build/$(KERNEL_NAME).elf > ./build/$(KERNEL_NAME)_objdump
 
 $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.c
 		mkdir -p $(@D)
@@ -125,8 +127,13 @@ debug-target-kernel1:
 debug-target-kernel2:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3335' ./build/$(KERNEL_NAME).elf
 
+debug-target-kernel3:
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3336' ./build/$(KERNEL_NAME).elf
 debug-target-bootloader:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(BOOTLOADER_NAME).elf
+
+debug-target-bootloader3:
+	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3336' ./build/$(BOOTLOADER_NAME).elf
 reset:
 	echo "ftdi_set_signal nSRST 1" | nc localhost 4444
 	echo "ftdi_set_signal nSRST 0" | nc localhost 4444

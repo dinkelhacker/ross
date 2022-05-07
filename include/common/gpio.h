@@ -71,4 +71,6 @@ extern int gpio_low_level_detect(uint8_t pin, uint32_t status);
 extern int gpio_async_rising_edge_detect(uint8_t pin, uint32_t status);
 
 extern int gpio_async_falling_edge_detect(uint8_t pin, uint32_t status);
+
+extern int gpio_irtrigger_high(uint8_t pin);
 #endif

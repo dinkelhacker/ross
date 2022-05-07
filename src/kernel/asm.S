@@ -48,6 +48,7 @@ cpu_switch_to:
 
 .globl wakeup_cores
 wakeup_cores:
+	dsb	sy
 	sev
 	ret
 

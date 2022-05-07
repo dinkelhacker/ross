@@ -63,11 +63,11 @@ void transition_process(unsigned long fn)
 
 void suspended(void)
 {
-	uart_print("Suspended 1\n");
+	sysc_print("Suspended 1\n", 12); 
 	syscall(SYSC_TASK_SUSPEND);
-	uart_print("Suspended 2\n");
+	sysc_print("Suspended 2\n", 12);
 	syscall(SYSC_TASK_SUSPEND);
-	uart_print("Suspended 3\n");
+	sysc_print("Suspended 3\n", 12);
 
 	while(1) {
 		delay(1000000);

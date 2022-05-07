@@ -15,7 +15,7 @@
 #define BOOT_CORE_STATUS  0x40000
 
 #define MEMORY_TOP        0xFE000000
-#define MEMORY_BOTTOM     2 * SECTION_SIZE
+#define MEMORY_BOTTOM     4 * SECTION_SIZE
 
 #define PAGE_SHIFT        12
 #define TABLE_SHIFT       9
