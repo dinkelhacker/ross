@@ -97,7 +97,7 @@ void mmu_setup_tables()
 
 	/* [80..511]: 0x0005,0000 - 0x01FF,FFFF */
 	for (uint32_t i = 80; i < 512; i++) {
-		lvl3_table[i] = TT_S1_NORMAL_NO_CACHE| 
+		lvl3_table[i] = TT_S1_NORMAL_WBWA | 
 				TT_S1_INNER_SHARED |
 				TT_S1_PAGE |
 				(i * addr);
