@@ -3,5 +3,6 @@
 
 extern void mmu_init(void);
 extern void mmu_setup_tables();
+extern void mmu_enable();
 
 #endif

@@ -71,6 +71,7 @@ void os_entry()
 	/* Init peripherals, system timer, MMU, enable IRQs */
 	mmu_setup_tables();
 	mmu_init();
+	mmu_enable();
 	uart_init();
 	enable_irq();
 	
@@ -103,6 +104,7 @@ void os_entry()
 
 void os_entry_secondary() {
 	mmu_init();
+	mmu_enable();
 	enable_irq();
 	os_idle();
 }

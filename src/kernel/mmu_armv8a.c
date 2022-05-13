@@ -1,10 +1,11 @@
 #include <stdint.h>
-#include "mm.h"
+//#include "mm.h"
 #include "memory_layout.h"
+#include "mmu_armv8a.h"
 
-static uint64_t *lvl1_table;
-static uint64_t *lvl2_table;
-static uint64_t *lvl3_table;
+ static uint64_t lvl1_table[4] __attribute__((aligned(4096)));
+ static uint64_t lvl2_table[512] __attribute__((aligned(4096)));
+ static uint64_t lvl3_table[512] __attribute__((aligned(4096)));
 
 /* Set up memory attributes
  * 
@@ -26,20 +27,19 @@ static uint64_t *lvl3_table;
 static void _set_ttbr0_el1(uint64_t * ttrbr0);
 static void _set_mair_el1(uint64_t mair_el1);
 static void _set_tcr_el1(uint64_t tcr_el1);
-static void _enable_mmu(void);
 
 void mmu_setup_tables()
 {
 	/* Each page is 4k.
 	 * Translation tables have to be 4k aligned.
 	 * Each table is 512 elements @ uint64_t. */
-	lvl1_table = (uint64_t *) get_free_page();
-	lvl2_table = (uint64_t *) get_free_page();
-	lvl3_table = (uint64_t *) get_free_page();
-	
-	memzero((void*) lvl1_table, PAGE_SIZE);
-	memzero((void*) lvl2_table, PAGE_SIZE);
-	memzero((void*) lvl3_table, PAGE_SIZE);
+	//lvl1_table = (uint64_t *) get_free_page();
+	//lvl2_table = (uint64_t *) get_free_page();
+	//lvl3_table = (uint64_t *) get_free_page();
+	//
+	//memzero((void*) lvl1_table, PAGE_SIZE);
+	//memzero((void*) lvl2_table, PAGE_SIZE);
+	//memzero((void*) lvl3_table, PAGE_SIZE);
 
 	/* Level 1 table */
 	/* [0]: 0x0000,0000 - 0x3FFF,FFFF */ 
@@ -121,12 +121,10 @@ void mmu_init()
 			    /* TG0 = 0b00. 4KB granule. */
 			    /* IPS = 0. 32-bit PA space. */
 		);
-	_enable_mmu();
-
 }
 
 
-static void _enable_mmu()
+void mmu_enable()
 {
 	__asm__ volatile (
 		"dsb sy\n"

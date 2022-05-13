@@ -60,7 +60,7 @@ memzero:
 	ret
 
 .globl setup_core
-/* void setup_core(cpu_boot_status *core, uint32_t addr) */
+/* void setup_core(volatile cpu_boot_status *core, uint32_t addr, uint32_t release_flag) */
 setup_core:
 	str	w1, [x0, 4]
 	dmb	ishst

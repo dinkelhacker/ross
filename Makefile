@@ -5,8 +5,8 @@ OBJCPY  = ./build/gcc-arm/bin/aarch64-none-elf-objcopy
 OBJDUMP = ./build/gcc-arm/bin/aarch64-none-elf-objdump
 ASM = ./build/gcc-arm/bin/aarch64-none-elf-gcc
 
-CFLAGS = -g3 -mcpu=cortex-a72 -fpic -ffreestanding
-AFLAGS = -D_ASM_
+CFLAGS = -g3 -mcpu=cortex-a72 -fpic -fPIE -pie -ffreestanding
+AFLAGS = -D_ASM_ -fpic -fPIE -pie
 # Uncomment if debugging with QEMU
 #CFLAGS += -DQEMU_DEBUG
 # Uncomment for boot code debugging

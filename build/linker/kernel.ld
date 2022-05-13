@@ -1,5 +1,6 @@
 #include "memory_layout.h"
 ENTRY(_start)
+
  
 SECTIONS
 {
@@ -46,11 +47,7 @@ SECTIONS
 	. = ALIGN(4096); /* align to page size */
 	__bss_end = .;
 	__bss_size = __bss_end - __bss_start;
-	//.locks 0x600000 :
-	//{
-	//	*(.bss)
-	//	*(.data)
-	//}
+
 	. = ALIGN(4096); /* align to page size */
 	__end = .;
 }
