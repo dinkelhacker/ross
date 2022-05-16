@@ -5,6 +5,7 @@
 
 extern void uart_init();
 extern void uart_print(char *buffer);
+extern void uart_do_print(char *buffer);
 extern unsigned int uart_read_u32();
 extern void uart_sendInt(unsigned int num);
 extern unsigned char uart_read_byte_blocking();

@@ -56,6 +56,7 @@ bootloader: $(BOOTLOADER_OBJECTS) ./build/linker/bootloader_gen.ld
 	echo $(BOOTLOADER_OBJECTS)
 	$(LD) -nostdlib $(BOOTLOADER_OBJECTS) -T ./build/linker/bootloader_gen.ld -o ./build/$(BOOTLOADER_NAME).elf -Map=./build/$(BOOTLOADER_NAME).map
 	$(OBJCPY) -O binary ./build/$(BOOTLOADER_NAME).elf ./build/$(BOOTLOADER_NAME).img 
+	$(OBJDUMP) -S build/$(BOOTLOADER_NAME).elf > ./build/$(BOOTLOADER_NAME)_objdump
 
 $(BOOTLDR_OBJ_DIR)/%.o: $(BOOTLOADER_SRC)/%.c
 	mkdir -p $(@D)

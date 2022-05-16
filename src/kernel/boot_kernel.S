@@ -19,6 +19,13 @@ _start:
 	b _start
 	mrs x3, CurrentEL
 #endif
+	dsb sy
+	mov 	x0, #(1 << 0)   	// M=1 Enable the stage 1 MMU
+	orr	x0, x0, #(1 << 2) 	// C=1 Enable data and unified caches
+	orr	x0, x0, #(1 << 12)   // I=1 Enable instruction fetches to allocate into unified caches
+	msr	sctlr_el3, x0
+	isb
+
 	// Check processor ID is zero (executing on main core), else hang
 	// Copy system register `mpidr_el1` into x1
 	mrs x1, mpidr_el1
@@ -26,16 +33,22 @@ _start:
 	and x1, x1, #3
 	cmp x1, #0
 	ldr x5, =__stack_core_0
-	beq _entry_el3_core0
+	adr x6, _entry_el3_core0
+	beq 1f
+	adr x6, _entry_el3
 	cmp x1, #1
 	ldr x5, =__stack_core_1
-	beq _entry_el3
+	beq 1f
 	cmp x1, #2
 	ldr x5, =__stack_core_2
-	beq _entry_el3
+	beq 1f
 	cmp x1, #3
 	ldr x5, =__stack_core_3
-	beq _entry_el3
+1:
+	mov x7, #0x4000000000
+	add x6, x6, x7
+	br x6
+
 
 _halt:  
 	// `WaitForEvent` suspend the core until an event occures 

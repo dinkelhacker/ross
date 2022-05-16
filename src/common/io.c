@@ -65,17 +65,18 @@ void uart_writeByteBlocking(unsigned char ch)
 
 void uart_print(char *buffer)
 {
-	#ifndef BOOTLOADER
 	spin_lock(&uart_lock);
-	#endif
+	uart_do_print(buffer);
+	spin_unlock(&uart_lock);
+}
+
+void uart_do_print(char *buffer)
+{
 	while (*buffer) {
 		 if (*buffer == '\n') 
 			 uart_writeByteBlocking('\r');
 		 uart_writeByteBlocking(*buffer++);
 	}
-	#ifndef BOOTLOADER
-	spin_unlock(&uart_lock);
-	#endif
 }
 
 unsigned char uart_read_byte_blocking()

@@ -21,6 +21,7 @@
 
 
 void os_idle(void);
+extern void _kernel_entry_el1();
 
 void init(
 	uint64_t dtb_ptr32,
@@ -32,7 +33,7 @@ void init(
 	(void) x1;
 	(void) x2;
 	(void) x3;
-	
+
 	uint32_t exceptionLevel = get_el();
 	init_vector_table();
 
@@ -50,7 +51,7 @@ void init(
 		gic400_ensgi(IRID_TIMER_SGI, GIC_GROUP1);
 	}
 	gic400_enable_cpuif();
-	
+
 	/* Configure processor */
 	_conf_sctlr_el1();
 	_conf_hcr_el2();

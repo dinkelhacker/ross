@@ -18,3 +18,8 @@ void free_page(unsigned long p)
 {
 	mem_map[(p - MEMORY_BOTTOM) / PAGE_SIZE] = 0;
 }
+
+uint64_t v2pa(uint64_t vaddr)
+{
+	return vaddr - KERNEL_VA_OFFSET;
+}
