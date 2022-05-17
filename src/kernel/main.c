@@ -39,7 +39,7 @@ void init(
 
 	/* Init the gic distributor only once from core 0 */
 	if(0 == get_core_id()) {
-		gic400_init((void *) 0xFF840000UL);
+		gic400_init((void *) p2va(GIC400_BASE));
 
 		// enable system timer interrupt (line 1)
 		gic400_enir(IRID_SYSTIMER, GIC_GROUP1, 0);
@@ -55,6 +55,11 @@ void init(
 	/* Configure processor */
 	_conf_sctlr_el1();
 	_conf_hcr_el2();
+	
+	/* Setup kernel mapping and init mmu at El1. */
+	mmu_setup_tables();
+	mmu_init();
+	mmu_enable();
 
 	/* if running at EL3 configure secure configuration register */
 	if (exceptionLevel == 3) {
@@ -70,10 +75,8 @@ void init(
 void os_entry()
 {
 	/* Init peripherals, system timer, MMU, enable IRQs */
-	mmu_setup_tables();
-	mmu_init();
-	mmu_enable();
-	uart_init();
+	uart_init(p2va(AUX_BASE));
+	gpio_init(p2va(GPIO_BASE));
 	enable_irq();
 	
 	/* Generate interrupt if pin 16 is `high` (for "reset pin"). */
@@ -91,7 +94,7 @@ void os_entry()
 	//(void) fork((unsigned long) &transition_process,(unsigned long) &suspended, 0);
 
 	/* Release other cores */
-	volatile cpu_boot_status *cores = (cpu_boot_status *) BOOT_CORE_STATUS;
+	volatile cpu_boot_status *cores = (cpu_boot_status *) p2va(BOOT_CORE_STATUS);
 	memzero((void *) cores, 3 * sizeof(cpu_boot_status));
 	setup_core(&cores[0], 0x160000, CORE_RELEASED);
 	setup_core(&cores[1], 0x160000, CORE_RELEASED);
@@ -99,7 +102,8 @@ void os_entry()
 	wakeup_cores();
 
 	/* Go to the os idle loop. */
-	timer_init();
+	timer_init(p2va(SYS_TIMER_BASE));
+	timer_reset();
 	os_idle();
 }
 

@@ -6,35 +6,38 @@
 #include "stdint.h"
 #include "spinlock.h"
 
-//__attribute__((section (".locks")))
 static spinlock_t uart_lock;
+static uint64_t uart_base;
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK/(baud*8))-1)
 
-void uart_init()
+//TODO: check if init
+
+void uart_init(uint64_t base)
 {
-	mmio_write32(AUX_ENABLES, 1); //enable UART1
-	mmio_write32(AUX_MU_IER_REG, 0);
-	mmio_write32(AUX_MU_CNTL_REG, 0);
-	mmio_write32(AUX_MU_LCR_REG, 3); //8 bits
-	mmio_write32(AUX_MU_MCR_REG, 0);
-	mmio_write32(AUX_MU_IER_REG, 0);
-	mmio_write32(AUX_MU_IIR_REG, 0xC6); //disable interrupts
-	mmio_write32(AUX_MU_BAUD_REG, AUX_MU_BAUD(115200));
+	uart_base = base;
+	mmio_write32(uart_base + AUX_ENABLES, 1); //enable UART1
+	mmio_write32(uart_base + AUX_MU_IER_REG, 0);
+	mmio_write32(uart_base + AUX_MU_CNTL_REG, 0);
+	mmio_write32(uart_base + AUX_MU_LCR_REG, 3); //8 bits
+	mmio_write32(uart_base + AUX_MU_MCR_REG, 0);
+	mmio_write32(uart_base + AUX_MU_IER_REG, 0);
+	mmio_write32(uart_base + AUX_MU_IIR_REG, 0xC6); //disable interrupts
+	mmio_write32(uart_base + AUX_MU_BAUD_REG, AUX_MU_BAUD(115200));
 	gpio_set_pull(14, GPIO_P_NONE);
 	gpio_set_pull(15, GPIO_P_NONE);
 	gpio_function_select(14, GPIO_F_ALT5);
 	gpio_function_select(15, GPIO_F_ALT5);
-	mmio_write32(AUX_MU_CNTL_REG, 3); //enable RX/TX
+	mmio_write32(uart_base + AUX_MU_CNTL_REG, 3); //enable RX/TX
 }
 
 uint32_t uart_isWriteByteReady()
 {
-	return mmio_read32(AUX_MU_LSR_REG) & 0x20;
+	return mmio_read32(uart_base + AUX_MU_LSR_REG) & 0x20;
 }
 
 uint32_t uart_is_read_rdy(){
-	return mmio_read32(AUX_MU_LSR_REG) & 0x01;
+	return mmio_read32(uart_base + AUX_MU_LSR_REG) & 0x01;
 }
 
 uint32_t uart_read_u32()
@@ -59,7 +62,7 @@ void uart_sendInt(uint32_t num)
 void uart_writeByteBlocking(unsigned char ch)
 {
 	while (!uart_isWriteByteReady()); 
-	mmio_write32(AUX_MU_IO_REG, (uint32_t)ch);
+	mmio_write32(uart_base + AUX_MU_IO_REG, (uint32_t)ch);
 }
 
 
@@ -82,14 +85,14 @@ void uart_do_print(char *buffer)
 unsigned char uart_read_byte_blocking()
 {
 	while (!uart_is_read_rdy());
-	return (unsigned char)mmio_read32(AUX_MU_IO_REG);
+	return (unsigned char)mmio_read32(uart_base + AUX_MU_IO_REG);
 }
 
 
 int uart_read_byte(char* byte)
 {
 	if (uart_is_read_rdy()) {
-		*byte = (unsigned char)mmio_read32(AUX_MU_IO_REG);
+		*byte = (unsigned char)mmio_read32(uart_base + AUX_MU_IO_REG);
 		return OK;
 	} else {
 		return ERROR;

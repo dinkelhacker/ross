@@ -50,25 +50,25 @@ void mmu_setup_tables()
 	lvl0_table[0] = TT_S1_TABLE |
 			v2pa(U64(lvl1_table));
 
-	/* Level 1 table */
-	/* [0]: 0x0000,0000 - 0x3FFF,FFFF */ 
-	lvl1_table[0] = TT_S1_TABLE |
-			v2pa(U64(lvl2_table));
-	
-	/* [1]: 0x4000,0000 - 0x7FFF,FFFF */
-	lvl1_table[1] = TT_S1_NORMAL_WBWA |
-			TT_S1_INNER_SHARED |
-			(uint64_t) 0x40000000;
+	///* Level 1 table */
+	///* [0]: 0x0000,0000 - 0x3FFF,FFFF */ 
+	//lvl1_table[0] = TT_S1_TABLE |
+	//		v2pa(U64(lvl2_table));
+	//
+	///* [1]: 0x4000,0000 - 0x7FFF,FFFF */
+	//lvl1_table[1] = TT_S1_NORMAL_WBWA |
+	//		TT_S1_INNER_SHARED |
+	//		(uint64_t) 0x40000000;
 
-	/* [2]: 0x8000,0000 - 0xBFFF,FFFF */
-	lvl1_table[2] = TT_S1_NORMAL_WBWA |
-			TT_S1_INNER_SHARED |
-			(uint64_t) 0x80000000;
+	///* [2]: 0x8000,0000 - 0xBFFF,FFFF */
+	//lvl1_table[2] = TT_S1_NORMAL_WBWA |
+	//		TT_S1_INNER_SHARED |
+	//		(uint64_t) 0x80000000;
 
-	/* [3]: 0xC000,0000 - 0xFFFF,FFFF */
-	lvl1_table[3] = TT_S1_DEVICE_nGnRnE |
-			TT_S1_INNER_SHARED |
-			(uint64_t) 0xC0000000;
+	///* [3]: 0xC000,0000 - 0xFFFF,FFFF */
+	//lvl1_table[3] = TT_S1_DEVICE_nGnRnE |
+	//		TT_S1_INNER_SHARED |
+	//		(uint64_t) 0xC0000000;
 
 	lvl1_table[256] = TT_S1_TABLE |
 			v2pa(U64(lvl2_table));
@@ -156,11 +156,20 @@ void mmu_init()
 void mmu_enable()
 {
 	__asm__ volatile (
-		"dsb sy\n"
+		"dsb	sy\n"
 		"mov 	x0, #(1 << 0)\n"   	// M=1 Enable the stage 1 MMU
 		"orr	x0, x0, #(1 << 2)\n" 	// C=1 Enable data and unified caches
 		"orr	x0, x0, #(1 << 12)\n"   // I=1 Enable instruction fetches to allocate into unified caches
 		"msr	sctlr_el1, x0\n"
+		"isb" ::);
+}
+
+void mmu_flush_tlb_e3()
+{
+	__asm__ volatile (
+		"dsb	sy\n"
+		"tlbi	alle3\n"   	// M=1 Enable the stage 1 MMU
+		"dsb	ish\n" 	// C=1 Enable data and unified caches
 		"isb" ::);
 }
 

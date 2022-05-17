@@ -202,8 +202,8 @@ serror_el0_32:
 .section ".text"
 .globl init_vector_table
 init_vector_table:
-	adr x0, vectors
-	msr vbar_el1, x0
+	adr 	x0, vectors
+	msr	vbar_el1, x0
 	ret
 
 // Enable all interrupts

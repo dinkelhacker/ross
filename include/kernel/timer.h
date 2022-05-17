@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-extern void timer_init(void);
+extern void timer_init(uint64_t base);
+extern void timer_reset();
 extern void delay(uint32_t delay);
 
 typedef struct {
