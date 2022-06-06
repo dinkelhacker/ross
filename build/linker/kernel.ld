@@ -1,6 +1,7 @@
 #include "memory_layout.h"
 ENTRY(_start)
- 
+
+
 SECTIONS
 {
 	/* Stacks for init tasks */
@@ -8,7 +9,7 @@ SECTIONS
 	__stack_core_1 = KERNEL_STACK_CORE1;
 	__stack_core_2 = KERNEL_STACK_CORE2;
 	__stack_core_3 = KERNEL_STACK_CORE3;
-	
+
 	/* Starts at KERNEL_BASE. */
 	. = KERNEL_BASE;
 	__start = .;
@@ -16,11 +17,15 @@ SECTIONS
 	.text :
 	{
 	    KEEP(*(.text.boot))
+	    __user_process_start = .;
+	    *(.text.user_process)
+	    __user_process_end = .;
 	    *(.text)
+	    . = ALIGN(4096);
+	    *(.text.syscalls)
 	}
 	. = ALIGN(4096); /* align to page size */
-	__text_end = .;
-	
+
 	__rodata_start = .;
 	.rodata :
 	{
@@ -28,7 +33,7 @@ SECTIONS
 	}
 	. = ALIGN(4096); /* align to page size */
 	__rodata_end = .;
-	
+
 	__data_start = .;
 	.data :
 	{
@@ -36,7 +41,7 @@ SECTIONS
 	}
 	. = ALIGN(4096); /* align to page size */
 	__data_end = .;
-	
+
 	__bss_start = .;
 	.bss :
 	{
@@ -46,11 +51,7 @@ SECTIONS
 	. = ALIGN(4096); /* align to page size */
 	__bss_end = .;
 	__bss_size = __bss_end - __bss_start;
-	//.locks 0x600000 :
-	//{
-	//	*(.bss)
-	//	*(.data)
-	//}
+
 	. = ALIGN(4096); /* align to page size */
 	__end = .;
 }

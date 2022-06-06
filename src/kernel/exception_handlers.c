@@ -10,6 +10,7 @@
 #include "exceptions.h"
 #include "syscall.h"
 #include "utils.h"
+#include "mm.h"
 
 #define EC_SHIFT 26
 #define EC_MASK ((uint8_t) 0x3f)
@@ -72,7 +73,7 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 			gic400_sched_timer();
 			uart_print("Timer Interrupt\n");
 			/* Reset the timer */
-			timer_init();
+			timer_reset();
 			/* fall through */
 		case IRID_TIMER_SGI:
 			/* Clear the interrupt otherwise it won't be fired again.*/
@@ -89,8 +90,8 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 			/* Clear the gpio event register, or it will be fired again.*/
 			gpio_clear_event(16);
 			/* Let the (Watch)Dog out ;)! */
-			mmio_write32(PM_WDOG, PM_PASSWORD | 1);
-			mmio_write32(PM_RSTC, PM_PASSWORD | PM_RSTC_RESET);
+			mmio_write32(p2va(PM_WDOG), PM_PASSWORD | 1);
+			mmio_write32(p2va(PM_RSTC), PM_PASSWORD | PM_RSTC_RESET);
 		break;
 		default:
 			uart_print("Unknown Interrupt\n");

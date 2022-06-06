@@ -22,10 +22,10 @@ static struct task_struct init_task3 =	{ {0,0,0,0,0,0,0,0,0,0,0,0,0}, 0,0,1,0,0 
 
 struct task_struct *current[4] = {&(init_task0), &(init_task1), &(init_task2), &(init_task3)};
 struct task_struct * task[4][5]= {
-	{&(init_task0), }, 
-	{&(init_task1), }, 
-	{&(init_task2), }, 
-	{&(init_task3), }, 
+	{&(init_task0), },
+	{&(init_task1), },
+	{&(init_task2), },
+	{&(init_task3), },
 };
 int nr_tasks[4] = {1,1,1,1};
 
@@ -48,28 +48,34 @@ void process(char *string)
 	}
 }
 
-void transition_process(unsigned long fn)
+void transition_process(struct user_transition_ctx *ctx)
 {
 	uint32_t thiscore = get_core_id();
 	processor_state *state =
 		(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state));
 	memzero((void*) state, sizeof(*state));
-	state->pc = fn;
-	state->pstate = EL0t; 
-	unsigned long userspace_stack = get_free_page();
+
+	uint64_t userspace_code = get_free_virt_upage();
+	uint64_t userspace_stack = get_free_virt_upage();
+	relocate_code(ctx->reloc_start, ctx->reloc_end, userspace_code);
+
+	state->pc = (unsigned long) userspace_code;
+	state->pstate = EL0t;
 	//TODO: Error check
 	state->sp = userspace_stack + PAGE_SIZE;
 }
 
-void suspended(void)
+void user_process(void)
 {
-	sysc_print("Suspended 1\n", 12); 
-	syscall(SYSC_TASK_SUSPEND);
-	sysc_print("Suspended 2\n", 12);
-	syscall(SYSC_TASK_SUSPEND);
-	sysc_print("Suspended 3\n", 12);
-
+	//sysc_print("Suspended 1\n", 12);
+	//syscall(SYSC_TASK_SUSPEND);
+	//sysc_print("Suspended 2\n", 12);
+	//syscall(SYSC_TASK_SUSPEND);
+	//sysc_print("Suspended 3\n", 12);
+	volatile int c = 0;
 	while(1) {
-		delay(1000000);
+		if (c == 1000)
+			c = 0;
+		c++;
 	}
 }

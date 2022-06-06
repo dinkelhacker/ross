@@ -2,20 +2,20 @@
 
 #include "tasks.h"
 
-/* 
+/*
  * This function performs the actual context switch.
  *
  * x0 = `current` task stuct
  * x1 = `next` task struct
- * 
+ *
  * Reminder:
- * [stp|ldp] xA, xb, [xD], #16 
+ * [stp|ldp] xA, xb, [xD], #16
  *	store/load register xA and xB in xD and move pointer in xD by 16
  *
  */
 .globl cpu_switch_to
 cpu_switch_to:
-	mov	x10, #OFFSET_CPU_CONTEXT 
+	mov	x10, #OFFSET_CPU_CONTEXT
 
 	// get a pointer to the `cpu_context` in the `current` task struct
 	add	x8, x0, x10
@@ -29,7 +29,7 @@ cpu_switch_to:
 	stp	x27, x28, [x8], #16
 	stp	x29, x9, [x8], #16
 	str	x30, [x8] // link register
-	
+
 	// get a pointer to the `cpu_context` in the `next` task struct
 	add	x8, x1, x10
 
@@ -60,7 +60,7 @@ memzero:
 	ret
 
 .globl setup_core
-/* void setup_core(cpu_boot_status *core, uint32_t addr) */
+/* void setup_core(volatile cpu_boot_status *core, uint32_t addr, uint32_t release_flag) */
 setup_core:
 	str	w1, [x0, 4]
 	dmb	ishst

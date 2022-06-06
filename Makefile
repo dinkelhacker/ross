@@ -5,14 +5,14 @@ OBJCPY  = ./build/gcc-arm/bin/aarch64-none-elf-objcopy
 OBJDUMP = ./build/gcc-arm/bin/aarch64-none-elf-objdump
 ASM = ./build/gcc-arm/bin/aarch64-none-elf-gcc
 
-CFLAGS = -g3 -mcpu=cortex-a72 -fpic -ffreestanding
-AFLAGS = -D_ASM_
+CFLAGS = -g3 -mcpu=cortex-a72 -fpic -fPIE -pie -ffreestanding
+AFLAGS = -D_ASM_ -fpic -fPIE -pie
 # Uncomment if debugging with QEMU
 #CFLAGS += -DQEMU_DEBUG
 # Uncomment for boot code debugging
 #AFLAGS+= -DDEBUG_STARTUP
 
-CSRCFLAGS= -O0 -Wall -Wextra -std=c99 -Werror-implicit-function-declaration
+CSRCFLAGS= -O0 -Wall -Wextra -std=c99 -Werror-implicit-function-declaration -ffunction-sections
 
 all: bootloader kernel
 .PHONY: all
@@ -55,7 +55,8 @@ BOOTLOADER_NAME=bootloader
 bootloader: $(BOOTLOADER_OBJECTS) ./build/linker/bootloader_gen.ld
 	echo $(BOOTLOADER_OBJECTS)
 	$(LD) -nostdlib $(BOOTLOADER_OBJECTS) -T ./build/linker/bootloader_gen.ld -o ./build/$(BOOTLOADER_NAME).elf -Map=./build/$(BOOTLOADER_NAME).map
-	$(OBJCPY) -O binary ./build/$(BOOTLOADER_NAME).elf ./build/$(BOOTLOADER_NAME).img 
+	$(OBJCPY) -O binary ./build/$(BOOTLOADER_NAME).elf ./build/$(BOOTLOADER_NAME).img
+	$(OBJDUMP) -S build/$(BOOTLOADER_NAME).elf > ./build/$(BOOTLOADER_NAME)_objdump
 
 $(BOOTLDR_OBJ_DIR)/%.o: $(BOOTLOADER_SRC)/%.c
 	mkdir -p $(@D)
@@ -82,7 +83,7 @@ KERNEL_NAME=kernel
 kernel: $(KERNEL_OBJECTS) ./build/linker/kernel_gen.ld
 		echo $(KERNEL_OBJECTS)
 		$(LD) -nostdlib $(KERNEL_OBJECTS) -T ./build/linker/kernel_gen.ld -o ./build/$(KERNEL_NAME).elf -Map=./build/$(KERNEL_NAME).map
-		$(OBJCPY) -O binary ./build/$(KERNEL_NAME).elf ./build/$(KERNEL_NAME).img 
+		$(OBJCPY) -O binary ./build/$(KERNEL_NAME).elf ./build/$(KERNEL_NAME).img
 		$(OBJDUMP) -S build/$(KERNEL_NAME).elf > ./build/$(KERNEL_NAME)_objdump
 
 $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.c
@@ -91,7 +92,7 @@ $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.c
 
 $(KERNEL_OBJ_DIR)/%.o: $(KERNEL_SRC)/%.S
 		mkdir -p $(@D)
-		$(ASM) $(AFLAGS) -I$(KERNEL_SRC) -I$(KERNEL_INCLUDE) -I$(COMMON_SRC) -I$(COMMON_INCLUDE) -c $< -o $@ 
+		$(ASM) $(AFLAGS) -I$(KERNEL_SRC) -I$(KERNEL_INCLUDE) -I$(COMMON_SRC) -I$(COMMON_INCLUDE) -c $< -o $@
 
 .PHONY: clean
 clean:
@@ -115,8 +116,8 @@ run-debug: all
 debug:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target remote 127.0.0.1:1234' ./build/$(KERNEL_NAME).elf
 
-run-debug-target: 
-	sudo openocd -f ./tools/adafruit.cfg  -f ./tools/raspi4.cfg 
+run-debug-target:
+	sudo openocd -f ./tools/adafruit.cfg  -f ./tools/raspi4.cfg
 
 debug-target-kernel0:
 	./build/gcc-arm/bin/aarch64-none-elf-gdb -ex 'target ext :3333' ./build/$(KERNEL_NAME).elf

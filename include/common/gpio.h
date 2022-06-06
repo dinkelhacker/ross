@@ -48,6 +48,8 @@ typedef struct gpio {
 	volatile uint32_t gppull[((GPPUPPDN3 + REG_SIZE) - GPPUPPDN0) / sizeof(uint32_t)];
 } gpio_t;
 
+extern void gpio_init(uint64_t base);
+
 extern int gpio_function_select(uint8_t pin, gpio_function fun);
 
 extern int gpio_set_pin(uint8_t pin);

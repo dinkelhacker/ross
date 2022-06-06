@@ -2,11 +2,22 @@
 #include "io.h"
 #include "timer.h"
 #include <stdint.h>
+#include <stdbool.h>
 
-static volatile sys_timer* timer = (sys_timer*) SYS_TIMER_BASE; 
+static volatile sys_timer* timer;
+static bool init = false;
 
-void timer_init(void)
+void timer_init(uint64_t base)
 {
+	timer = (sys_timer*) base; 
+	init = true;
+}
+
+void timer_reset(void)
+{
+	if(!init)
+		return; // error
+
 	uint32_t cur = timer->clo;
 	// system timer runs at 1 MHz == 1 sec
 	cur += 2 * 5000000;

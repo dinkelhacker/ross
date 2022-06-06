@@ -24,6 +24,16 @@ struct cpu_context {
 	unsigned long pc;
 };
 
+struct mmap {
+	uint64_t *codep;
+	uint64_t *data;
+};
+
+struct user_transition_ctx {
+	uint64_t *reloc_start;
+	uint64_t *reloc_end;
+};
+
 typedef struct task_struct {
 	struct cpu_context cpu_context;
 	long state;
@@ -50,17 +60,13 @@ extern struct task_struct *current[4];
 extern struct task_struct * task[4][5];
 extern int nr_tasks[4];
 
-extern void
-process(char* string);
+extern void process(char* string);
 
-extern void 
-transition_process(unsigned long fn);
+extern void transition_process(struct user_transition_ctx *ctx);
 
-extern void 
-suspended(void);
+extern void user_process(void);
 
-extern void 
-reset_device(void);
+extern void reset_device(void);
 
 extern int fork(unsigned long fn_addr, unsigned long args, uint32_t target_core);
 #endif

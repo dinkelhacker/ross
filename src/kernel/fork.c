@@ -17,7 +17,7 @@ int fork(unsigned long fn_addr, unsigned long args, uint32_t target_core)
 	// disable preemption during the fork
 	disable_preemption();
 	//allocate a new task struct
-	task_struct *p = (task_struct *) get_free_page();
+	task_struct *p = (task_struct *) get_free_virt_kpage();
 	if(!p)
 		return ERROR;
 
@@ -29,7 +29,7 @@ int fork(unsigned long fn_addr, unsigned long args, uint32_t target_core)
 	// set the task's preempt counter so it won't be interrupted during the
 	// end of the schedule process
 	p->preempt_count = 1;
-	
+
 	// setup cpu_context of forked task
 	p->cpu_context.x19 = fn_addr;
 	p->cpu_context.x20 = args;
@@ -43,9 +43,9 @@ int fork(unsigned long fn_addr, unsigned long args, uint32_t target_core)
 	p->pid = pid;
 	task[target_core][pid] = p;
 
-	
+
 	enable_preemption();
-	
+
 	return OK;
 
 }

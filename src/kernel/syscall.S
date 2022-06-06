@@ -1,5 +1,5 @@
 #include "syscall.h"
-.section ".text"
+.section ".text.syscalls"
 /*
  * Syscall numbers goes into x8 ?
  *
@@ -9,7 +9,7 @@
  // use immediate? (goes into ESR)
 .globl syscall
 syscall:
-	mov x8, x0 
+	mov x8, x0
 	svc  #0x0
 	ret
 

@@ -67,3 +67,4 @@ wait_for_release:
 	dmb	ishld
 	ldr	w0, [x2,4]
 	b 	jump_to
+
