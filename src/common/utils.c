@@ -24,7 +24,7 @@ void print_core_id(void){
 		uart_print("Running on Core 3\n");
 }
 
-inline __attribute__((always_inline)) void ensure_coheret_execution(uint64_t addr)
+inline __attribute__((always_inline)) void ensure_id_cache_coherence(uint64_t addr)
 {
 		__asm__ volatile (
 		"dc	cvau, %0\n"
@@ -39,7 +39,7 @@ void relocate_code(uint64_t *start, uint64_t *end, uint64_t * dest)
 {
 	while (start < end) {
 		*dest = *start;
-		ensure_coheret_execution(dest);
+		ensure_id_cache_coherence(dest);
 		start++;
 		dest++;
 
