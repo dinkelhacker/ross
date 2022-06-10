@@ -41,7 +41,7 @@ uint64_t get_free_upage()
 	for (uint32_t i = 0; i < PAGES_USER; i++) {
 		if (umem_map[i] == 0){
 			umem_map[i] = 1;
-			return MEMORY_BOTTOM_USER + i*PAGE_SIZE;
+			return MEMORY_BOTTOM_USER_PAGING + i*PAGE_SIZE;
 		}
 	}
 	return 0;

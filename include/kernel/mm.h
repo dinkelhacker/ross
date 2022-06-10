@@ -10,5 +10,13 @@ extern void memzero(void* src, unsigned long n);
 extern uint64_t v2pa(uint64_t vaddr);
 extern uint64_t p2va(uint64_t paddr);
 
+struct mmap {
+	uint64_t *table;
+};
+
+//struct page {
+//
+//}
+
 #endif
 

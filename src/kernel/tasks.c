@@ -1,6 +1,7 @@
 #include "io.h"
 #include "syscall.h"
 #include "memory_layout.h"
+#include "mmu_armv8a.h"
 #include "error.h"
 #include "tasks.h"
 #include "timer.h"
@@ -55,14 +56,17 @@ void transition_process(struct user_transition_ctx *ctx)
 		(processor_state *) (current[thiscore] + PAGE_SIZE - sizeof(processor_state));
 	memzero((void*) state, sizeof(*state));
 
-	uint64_t userspace_code = get_free_virt_upage();
-	uint64_t userspace_stack = get_free_virt_upage();
-	relocate_code(ctx->reloc_start, ctx->reloc_end, userspace_code);
+	uint64_t userspace_code = get_free_upage();
+	uint64_t userspace_stack = get_free_upage();
+	struct mmap *mmap = mmu_create_user_mapping(userspace_code, userspace_stack);
+	mmu_update_user_mapping(mmap);
+	// TODO: for now code goes to 0x0 and data goes to 0x1000
+	relocate_code(ctx->reloc_start, ctx->reloc_end, 0x0/*userspace_code*/);
 
-	state->pc = (unsigned long) userspace_code;
+	state->pc = (unsigned long) 0x0/*userspace_code*/;
 	state->pstate = EL0t;
 	//TODO: Error check
-	state->sp = userspace_stack + PAGE_SIZE;
+	state->sp = /*userspace_stack*/ 0x1000 + PAGE_SIZE;
 }
 
 void user_process(void)

@@ -22,7 +22,10 @@ SECTIONS
 	    __user_process_end = .;
 	    *(.text)
 	    . = ALIGN(4096);
+	    __user_syscalls_start = .;
 	    *(.text.syscalls)
+	    . = ALIGN(4096);
+	    __user_syscalls_end = .;
 	}
 	. = ALIGN(4096); /* align to page size */
 

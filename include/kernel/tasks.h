@@ -24,11 +24,6 @@ struct cpu_context {
 	unsigned long pc;
 };
 
-struct mmap {
-	uint64_t *codep;
-	uint64_t *data;
-};
-
 struct user_transition_ctx {
 	uint64_t *reloc_start;
 	uint64_t *reloc_end;
