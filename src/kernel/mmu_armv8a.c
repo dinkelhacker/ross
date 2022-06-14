@@ -12,8 +12,6 @@
 
  /* User space*/
  static uint64_t us_lvl2_table[512] __attribute__((aligned(4096)));
- static uint64_t ulib_lvl2_table[512] __attribute__((aligned(4096)));
- static uint64_t ulib_lvl3_table[512] __attribute__((aligned(4096)));
 
 /* Set up memory attributes
  *
@@ -43,7 +41,6 @@ static void _set_mair_el1(uint64_t mair_el1);
 static void _set_tcr_el1(uint64_t tcr_el1);
 
 #define U64(value) ((uint64_t) value)
-#define USER_LIB_PAGES (&__user_process_end - &__user_syscalls_start) / PAGE_SIZE
 
 void mmu_setup_tables()
 {
@@ -121,48 +118,14 @@ void mmu_setup_tables()
 				(i * addr);
 	}
 
-	/* Userspace */
 
+
+	/* Userspace */
 	/* Tasks go here ... */
 	/* [0]: Virt: 00 0000,0000 - 0x00 3FFF,FFFF */
 	lvl1_table[0] = TT_S1_TABLE |
 			TT_S1_TABLE_PXN |
 			v2pa(U64(us_lvl2_table));
-
-	///* User lib goes here...*/
-	//lvl1_table[1] = TT_S1_TABLE |
-	//		TT_S1_TABLE_PXN |
-	//		v2pa(U64(ulib_lvl2_table));
-
-	//for (uint32_t i = 0; i < USER_LIB_PAGES; i++)
-	//{
-	//	ulib_lvl3_table[i] =
-	//	TT_S1_NORMAL_WBWA |
-	//	TT_S1_INNER_SHARED |
-	//	TT_S1_PAGE |
-	//	//TT_S1_PAGE_UXN |
-	//	TT_S1_PAGE_EL0_RW | // TODO: Make readonly
-	//	U64(codep);
-	//}
-
-			//
-	//uint64_t us_pa = (uint64_t) 0x80000000;
-	//for (uint32_t i = 0; i < 512; i++)
-	//{
-	//	us_lvl2_table[i] = TT_S1_TABLE |
-	//			   v2pa(U64(&us_lvl3_table[i][0]));
-
-	//	for (uint32_t j = 0; j < 512; j++)
-	//	{
-	//		us_lvl3_table[i][j] =
-	//			TT_S1_NORMAL_WBWA |
-	//			TT_S1_INNER_SHARED |
-	//			TT_S1_PAGE |
-	//			TT_S1_PAGE_EL0_RW |
-	//			us_pa;
-	//		us_pa += 0x1000;
-	//	}
-	//}
 }
 
 void mmu_update_user_mapping(struct mmap *mmap)

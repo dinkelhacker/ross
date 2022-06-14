@@ -17,17 +17,21 @@ SECTIONS
 	.text :
 	{
 	    KEEP(*(.text.boot))
-	    __user_process_start = .;
-	    *(.text.user_process)
-	    __user_process_end = .;
 	    *(.text)
-	    . = ALIGN(4096);
-	    __user_syscalls_start = .;
-	    *(.text.syscalls)
-	    . = ALIGN(4096);
-	    __user_syscalls_end = .;
 	}
 	. = ALIGN(4096); /* align to page size */
+
+	.user :
+	{
+		__user_process_start = .;
+		./build/objects_kernel/user.o (.text.*)
+		./build/objects_kernel/user.o (.data)
+		./build/objects_kernel/user.o (.rodata)
+		./build/objects_kernel/user.o (.bss)
+		__user_process_end = .;
+	}
+	. = ALIGN(4096); /* align to page size */
+
 
 	__rodata_start = .;
 	.rodata :
@@ -44,17 +48,18 @@ SECTIONS
 	}
 	. = ALIGN(4096); /* align to page size */
 	__data_end = .;
-
 	__bss_start = .;
 	.bss :
 	{
 	    bss = .;
 	    *(.bss)
 	}
+
 	. = ALIGN(4096); /* align to page size */
 	__bss_end = .;
 	__bss_size = __bss_end - __bss_start;
 
 	. = ALIGN(4096); /* align to page size */
+
 	__end = .;
 }

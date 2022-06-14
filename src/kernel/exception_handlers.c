@@ -18,7 +18,7 @@
 
 static uint8_t get_exception_class(uint32_t esr)
 {
-	return ((uint8_t)(esr >> EC_SHIFT)) & EC_MASK;	
+	return ((uint8_t)(esr >> EC_SHIFT)) & EC_MASK;
 }
 
 void invalid_exception(uint32_t type, unsigned long esr, unsigned long address)
@@ -36,9 +36,19 @@ void handle_syscall(uint32_t exception_type, uint32_t sysid)
 	switch (sysid){
 	case SYSC_TASK_SUSPEND:
 		enable_irq();
-		uart_print("Syscall\n");
+		uart_print("Suspend syscall\n");
 		scheduler();
 		disable_irq();
+	break;
+
+	case SYSC_UART_PRINT:
+		enable_irq();
+		char * text;
+		__asm__ volatile (
+		"mov 	%0,x10" :"=r" (text):);
+		uart_print(text);
+	break;
+
 	}
 }
 
@@ -78,7 +88,7 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 		case IRID_TIMER_SGI:
 			/* Clear the interrupt otherwise it won't be fired again.*/
 			gicc_eoi(irid);
-			/* Call the scheduler with interrupts enabled 
+			/* Call the scheduler with interrupts enabled
 			 * (disabled in an execption handler) */
 			enable_irq();
 			scheduler();
@@ -101,6 +111,6 @@ void handle_irq(uint32_t type, unsigned long esr, unsigned long address)
 	} else {
 		/* O.o Unexpected! */
 		uart_print("Unknown Interrupt\n");
-		while(1); 
+		while(1);
 	}
 }
